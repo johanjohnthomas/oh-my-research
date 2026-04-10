@@ -44,6 +44,12 @@ npm pack --silent
 
 Publish only after the installed `oh-my-research` binary and the packaged `research-runtime` entrypoint both verify successfully.
 
+For the scoped public release, publish with:
+
+```bash
+npm publish --access public
+```
+
 ## Important Note
 
 Some legacy runtime and compatibility code from the original project still exists. If you touch those areas, keep changes aligned with the released research-first product surface rather than extending the old plugin-era behavior.
