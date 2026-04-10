@@ -82,9 +82,6 @@
     "hashline_edit": {
       "type": "boolean"
     },
-    "model_fallback": {
-      "type": "boolean"
-    },
     "agents": {
       "type": "object",
       "properties": {
@@ -8942,9 +8939,6 @@
         "hashline_edit": {
           "type": "boolean"
         },
-        "model_fallback_title": {
-          "type": "boolean"
-        },
         "max_tools": {
           "type": "integer",
           "minimum": 1,
@@ -9098,44 +9092,6 @@
         "default_strategy"
       ],
       "additionalProperties": false
-    },
-    "runtime_fallback": {
-      "anyOf": [
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "type": "boolean"
-            },
-            "retry_on_errors": {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            },
-            "max_fallback_attempts": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 20
-            },
-            "cooldown_seconds": {
-              "type": "number",
-              "minimum": 0
-            },
-            "timeout_seconds": {
-              "type": "number",
-              "minimum": 0
-            },
-            "notify_on_fallback": {
-              "type": "boolean"
-            }
-          },
-          "additionalProperties": false
-        }
-      ]
     },
     "background_task": {
       "type": "object",

@@ -15,5 +15,3 @@ export function createOhMyResearchJsonSchema(): Record<string, unknown> {
     ...jsonSchema,
   }
 }
-
-export const createOhMyOpenCodeJsonSchema = createOhMyResearchJsonSchema
