@@ -1,6 +1,6 @@
 # Contributing
 
-This repository is in an active remake from the original Oh-My-OpenCode harness into a research-first workflow for evidence-backed LaTeX paper development.
+Oh My Research is a research-first workflow for evidence-backed LaTeX paper development.
 
 ## Current Contribution Focus
 
@@ -11,7 +11,7 @@ Contributions should align with the research-first direction:
 - manuscript and verification workflow
 - first-class local Obsidian export
 - first-class local derived knowledge graph support
-- runtime extraction away from legacy host-coupled surfaces
+- keeping the released research-first operator path stable and verifiable
 
 ## Current Workflow
 
@@ -30,6 +30,20 @@ The current operator surface is documented in:
 - `docs/reference/cli.md`
 - `docs/guide/installation.md`
 
+## Release Checklist
+
+Before publishing a release:
+
+```bash
+bun run typecheck
+bun test
+bun run build
+bun run verify:product
+npm pack --silent
+```
+
+Publish only after the installed `oh-my-research` binary and the packaged `research-runtime` entrypoint both verify successfully.
+
 ## Important Note
 
-Some legacy runtime and compatibility code from the original project still exists during the remake. If you touch those areas, keep changes aligned with the research-first migration path rather than extending the old plugin-era product surface.
+Some legacy runtime and compatibility code from the original project still exists. If you touch those areas, keep changes aligned with the released research-first product surface rather than extending the old plugin-era behavior.
