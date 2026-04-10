@@ -1,3 +1,5 @@
+export const PACKAGE_NAME = "@johanjohnthomas/oh-my-research"
+export const LEGACY_PACKAGE_NAME = "oh-my-research"
 export const PLUGIN_NAME = "oh-my-research"
 export const LEGACY_PLUGIN_NAME = "oh-my-opencode"
 export const CONFIG_BASENAME = "oh-my-research"

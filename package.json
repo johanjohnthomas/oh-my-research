@@ -1,5 +1,5 @@
 {
-  "name": "oh-my-research",
+  "name": "@johanjohnthomas/oh-my-research",
   "version": "1.0.0",
   "description": "Local-first research workflow system for evidence-backed LaTeX paper iteration",
   "main": "./dist/research-runtime.js",
@@ -19,6 +19,9 @@
       "types": "./dist/research-runtime.d.ts",
       "import": "./dist/research-runtime.js"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "rm -rf dist && bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi && bun build src/research-runtime.ts --outdir dist --target bun --format esm --external @ast-grep/napi && tsc --emitDeclarationOnly && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi && bun run build:schema",

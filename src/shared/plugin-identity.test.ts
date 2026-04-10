@@ -1,7 +1,13 @@
 import { describe, it, expect } from "bun:test"
-import { PLUGIN_NAME, CONFIG_BASENAME, LOG_FILENAME, CACHE_DIR_NAME } from "./plugin-identity"
+import { PACKAGE_NAME, PLUGIN_NAME, CONFIG_BASENAME, LOG_FILENAME, CACHE_DIR_NAME } from "./plugin-identity"
 
 describe("plugin-identity constants", () => {
+  describe("PACKAGE_NAME", () => {
+    it("equals the scoped npm package name", () => {
+      expect(PACKAGE_NAME).toBe("@johanjohnthomas/oh-my-research")
+    })
+  })
+
   describe("PLUGIN_NAME", () => {
     it("equals oh-my-research", () => {
       // given

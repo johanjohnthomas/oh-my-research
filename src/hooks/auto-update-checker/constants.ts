@@ -1,9 +1,9 @@
 import * as path from "node:path"
 import * as os from "node:os"
+import { PACKAGE_NAME as SHARED_PACKAGE_NAME } from "../../shared/plugin-identity"
 import { getOpenCodeCacheDir } from "../../shared/data-path"
 import { getOpenCodeConfigDir } from "../../shared/opencode-config-dir"
-
-export const PACKAGE_NAME = "oh-my-research"
+export const PACKAGE_NAME = SHARED_PACKAGE_NAME
 export const NPM_REGISTRY_URL = `https://registry.npmjs.org/-/package/${PACKAGE_NAME}/dist-tags`
 export const NPM_FETCH_TIMEOUT = 5000
 
