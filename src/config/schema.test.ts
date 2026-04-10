@@ -448,6 +448,16 @@ describe("BuiltinCategoryNameSchema", () => {
 })
 
 describe("HookNameSchema", () => {
+  test("rejects removed model-fallback hook name", () => {
+    const result = HookNameSchema.safeParse("model-fallback")
+    expect(result.success).toBe(false)
+  })
+
+  test("rejects removed runtime-fallback hook name", () => {
+    const result = HookNameSchema.safeParse("runtime-fallback")
+    expect(result.success).toBe(false)
+  })
+
   test("rejects removed beast-mode-system hook name", () => {
     //#given
     const input = "beast-mode-system"
@@ -468,6 +478,14 @@ describe("HookNameSchema", () => {
 
     //#then
     expect(result.success).toBe(false)
+  })
+})
+
+describe("OhMyResearchConfigSchema release contract", () => {
+  test("rejects removed model fallback fields", () => {
+    expect(OhMyResearchConfigSchema.safeParse({ model_fallback: true }).success).toBe(false)
+    expect(OhMyResearchConfigSchema.safeParse({ runtime_fallback: { enabled: true } }).success).toBe(false)
+    expect(OhMyResearchConfigSchema.safeParse({ experimental: { model_fallback_title: true } }).success).toBe(false)
   })
 })
 

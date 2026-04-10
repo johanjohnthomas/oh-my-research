@@ -18,10 +18,8 @@ export const ExperimentalConfigSchema = z.object({
   disable_omo_env: z.boolean().optional(),
   /** Enable hashline_edit tool for improved file editing with hash-based line anchors */
   hashline_edit: z.boolean().optional(),
-  /** Append fallback model info to session title when a runtime fallback occurs (default: false) */
-  model_fallback_title: z.boolean().optional(),
   /** Maximum number of tools to register. When set, lower-priority tools are excluded to stay within provider limits (e.g., OpenAI's 128-tool cap). Accounts for ~20 OpenCode built-in tools. */
   max_tools: z.number().int().min(1).optional(),
-})
+}).strict()
 
 export type ExperimentalConfig = z.infer<typeof ExperimentalConfigSchema>
