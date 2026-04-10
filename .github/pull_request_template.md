@@ -25,6 +25,8 @@
 ```bash
 bun run typecheck
 bun test
+bun run build
+bun run verify:product
 ```
 
 ## Related Issues
