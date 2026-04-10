@@ -7,13 +7,4 @@ export * from "./features/research-reproducibility"
 export * from "./features/research-verification"
 export * from "./features/research-workflow"
 
-export type {
-  OhMyResearchConfig,
-  AgentOverrideConfig,
-  AgentOverrides,
-  BuiltinCommandName,
-  HookName,
-  McpName,
-} from "./config"
-
 export type { ConfigLoadError } from "./shared/config-errors"

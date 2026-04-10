@@ -1,6 +1,6 @@
 {
   "name": "oh-my-research",
-  "version": "3.16.0",
+  "version": "1.0.0",
   "description": "Local-first research workflow system for evidence-backed LaTeX paper iteration",
   "main": "./dist/research-runtime.js",
   "types": "dist/research-runtime.d.ts",
@@ -12,22 +12,20 @@
     "dist/research-runtime.js",
     "dist/research-runtime.d.ts",
     "dist/cli/index.js",
-    "dist/config",
-    "dist/shared/config-errors.d.ts",
-    "dist/oh-my-research.schema.json"
+    "dist/shared/config-errors.d.ts"
   ],
   "exports": {
     ".": {
       "types": "./dist/research-runtime.d.ts",
       "import": "./dist/research-runtime.js"
-    },
-    "./schema.json": "./dist/oh-my-research.schema.json"
+    }
   },
   "scripts": {
     "build": "rm -rf dist && bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi && bun build src/research-runtime.ts --outdir dist --target bun --format esm --external @ast-grep/napi && tsc --emitDeclarationOnly && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi && bun run build:schema",
     "build:schema": "bun run script/build-schema.ts",
     "build:model-capabilities": "bun run script/build-model-capabilities.ts",
     "clean": "rm -rf dist",
+    "postinstall": "node -e \"const {spawnSync}=require('node:child_process');const r=spawnSync('bun',['--version'],{stdio:'ignore'});if(r.error||r.status!==0){console.error('oh-my-research requires Bun on PATH to run the installed CLI. Install Bun from https://bun.sh first.');process.exit(1)}\"",
     "prepare": "bun run build",
     "verify:product": "bun run script/verify-product.ts",
     "test:tmux": "bun test src/shared/tmux/tmux-utils.test.ts src/shared/tmux/tmux-utils/layout.test.ts",
@@ -46,6 +44,9 @@
   ],
   "author": "Oh My Research contributors",
   "license": "SUL-1.0",
+  "engines": {
+    "bun": ">=1.3.11"
+  },
   "dependencies": {
     "@ast-grep/cli": "^0.41.1",
     "@ast-grep/napi": "^0.41.1",
