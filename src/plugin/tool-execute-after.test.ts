@@ -4,7 +4,7 @@ import { createToolExecuteAfterHandler } from "./tool-execute-after"
 describe("createToolExecuteAfterHandler", () => {
   it("#given truncator changes output #when tool.execute.after runs #then claudeCodeHooks receives truncated output", async () => {
     const callOrder: string[] = []
-    let claudeSawOutput = ""
+    let claudeCodeSawOutput = ""
 
     const handler = createToolExecuteAfterHandler({
       ctx: { directory: "/repo" } as never,
@@ -17,8 +17,8 @@ describe("createToolExecuteAfterHandler", () => {
         },
         claudeCodeHooks: {
           "tool.execute.after": async (_input, output) => {
-            callOrder.push("claude")
-            claudeSawOutput = output.output
+            callOrder.push("claudeCode")
+            claudeCodeSawOutput = output.output
           },
         },
       } as never,
@@ -29,7 +29,7 @@ describe("createToolExecuteAfterHandler", () => {
       { title: "result", output: "original output", metadata: {} }
     )
 
-    expect(callOrder).toEqual(["truncator", "claude"])
-    expect(claudeSawOutput).toBe("truncated output")
+    expect(callOrder).toEqual(["truncator", "claudeCode"])
+    expect(claudeCodeSawOutput).toBe("truncated output")
   })
 })

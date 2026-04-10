@@ -1,6 +1,6 @@
-import type { OhMyOpenCodeConfig } from "../../config"
-import type { PluginContext } from "../types"
+import type { OhMyResearchConfig } from "../../config"
 import type { RalphLoopHook } from "../../hooks/ralph-loop"
+import type { RuntimeContext } from "../../runtime-context"
 
 import {
   createClaudeCodeHooksHook,
@@ -15,6 +15,7 @@ import {
 import { safeCreateHook } from "../../shared/safe-create-hook"
 
 export type TransformHooks = {
+  hostCompatibilityHooks: ReturnType<typeof createClaudeCodeHooksHook> | null
   claudeCodeHooks: ReturnType<typeof createClaudeCodeHooksHook> | null
   keywordDetector: ReturnType<typeof createKeywordDetectorHook> | null
   contextInjectorMessagesTransform: ReturnType<typeof createContextInjectorMessagesTransformHook>
@@ -23,8 +24,8 @@ export type TransformHooks = {
 }
 
 export function createTransformHooks(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   isHookEnabled: (hookName: string) => boolean
   safeHookEnabled?: boolean
   ralphLoop?: RalphLoopHook | null
@@ -77,6 +78,7 @@ export function createTransformHooks(args: {
 
   return {
     claudeCodeHooks,
+    hostCompatibilityHooks: claudeCodeHooks,
     keywordDetector,
     contextInjectorMessagesTransform,
     thinkingBlockValidator,

@@ -1,9 +1,9 @@
 import type { AvailableSkill } from "./agents/dynamic-agent-prompt-builder"
-import type { HookName, OhMyOpenCodeConfig } from "./config"
+import type { HookName, OhMyResearchConfig } from "./config"
 import type { LoadedSkill } from "./features/opencode-skill-loader/types"
 import type { BackgroundManager } from "./features/background-agent"
-import type { PluginContext } from "./plugin/types"
 import type { ModelCacheState } from "./plugin-state"
+import type { RuntimeContext } from "./runtime-context"
 
 import { createCoreHooks } from "./plugin/hooks/create-core-hooks"
 import { createContinuationHooks } from "./plugin/hooks/create-continuation-hooks"
@@ -14,6 +14,7 @@ export type CreatedHooks = ReturnType<typeof createHooks>
 type DisposableHook = { dispose?: () => void } | null | undefined
 
 export type DisposableCreatedHooks = {
+  hostCompatibilityHooks?: DisposableHook
   claudeCodeHooks?: DisposableHook
   commentChecker?: DisposableHook
   runtimeFallback?: DisposableHook
@@ -23,7 +24,17 @@ export type DisposableCreatedHooks = {
 }
 
 export function disposeCreatedHooks(hooks: DisposableCreatedHooks): void {
-  hooks.claudeCodeHooks?.dispose?.()
+  const disposedHooks = new Set<DisposableHook>()
+  const disposeHook = (hook: DisposableHook): void => {
+    if (!hook || disposedHooks.has(hook)) {
+      return
+    }
+    disposedHooks.add(hook)
+    hook.dispose?.()
+  }
+
+  disposeHook(hooks.claudeCodeHooks)
+  disposeHook(hooks.hostCompatibilityHooks)
   hooks.commentChecker?.dispose?.()
   hooks.runtimeFallback?.dispose?.()
   hooks.todoContinuationEnforcer?.dispose?.()
@@ -32,8 +43,8 @@ export function disposeCreatedHooks(hooks: DisposableCreatedHooks): void {
 }
 
 export function createHooks(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   modelCacheState: ModelCacheState
   backgroundManager: BackgroundManager
   isHookEnabled: (hookName: HookName) => boolean
