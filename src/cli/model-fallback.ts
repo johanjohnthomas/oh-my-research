@@ -23,8 +23,6 @@ export type { GeneratedOmoConfig } from "./model-fallback-types"
 const ZAI_MODEL = "zai-coding-plan/glm-4.7"
 
 const ULTIMATE_FALLBACK = "opencode/gpt-5-nano"
-const SCHEMA_URL = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json"
-
 function toFallbackModelObject(entry: FallbackEntry, provider: string): FallbackModelObject {
   return {
     model: `${provider}/${transformModelForProvider(provider, entry.model)}`,
@@ -108,7 +106,6 @@ export function generateModelConfig(config: InstallConfig): GeneratedOmoConfig {
     avail.opencodeGo
   if (!hasAnyProvider) {
     return {
-      $schema: SCHEMA_URL,
       agents: Object.fromEntries(
         Object.entries(CLI_AGENT_MODEL_REQUIREMENTS)
           .filter(([role, req]) => !(role === "sisyphus" && req.requiresAnyModel))
@@ -210,7 +207,6 @@ export function generateModelConfig(config: InstallConfig): GeneratedOmoConfig {
   }
 
   const generatedConfig: GeneratedOmoConfig = {
-    $schema: SCHEMA_URL,
     agents,
     categories,
   }

@@ -27,7 +27,6 @@ export interface CategoryConfig {
 }
 
 export interface GeneratedOmoConfig {
-	$schema: string
 	agents?: Record<string, AgentConfig>
 	categories?: Record<string, CategoryConfig>
 	[key: string]: unknown
