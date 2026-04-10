@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
 import { runCli } from "./cli-program"
+import { bootstrapOpenCodeIntegration } from "./opencode-bootstrap"
 
-runCli()
+await bootstrapOpenCodeIntegration()
+await runCli()

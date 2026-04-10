@@ -270,6 +270,6 @@ export function createCliProgram(): Command {
   return program
 }
 
-export function runCli(): void {
-  createCliProgram().parse()
+export async function runCli(): Promise<void> {
+  await createCliProgram().parseAsync(process.argv)
 }
