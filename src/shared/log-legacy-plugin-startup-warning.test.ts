@@ -68,7 +68,7 @@ describe("logLegacyPluginStartupWarning", () => {
         "[OhMyOpenCodePlugin] Legacy plugin entry detected in OpenCode config",
         {
           legacyEntries: ["oh-my-opencode", "oh-my-opencode@3.13.1"],
-          suggestedEntries: ["oh-my-research", "oh-my-research@3.13.1"],
+          suggestedEntries: ["@johanjohnthomas/oh-my-research", "@johanjohnthomas/oh-my-research@3.13.1"],
           hasCanonicalEntry: false,
         },
       )
@@ -94,7 +94,7 @@ describe("logLegacyPluginStartupWarning", () => {
       expect(consoleWarnSpy).toHaveBeenCalled()
       const firstCall = consoleWarnSpy.mock.calls[0]?.[0] as string
       expect(firstCall).toContain("oh-my-opencode")
-      expect(firstCall).toContain("oh-my-openagent")
+      expect(firstCall).toContain("@johanjohnthomas/oh-my-research")
     })
 
     it("#then attempts auto-migration of the opencode.json", async () => {

@@ -2,7 +2,7 @@ import { checkForLegacyPluginEntry } from "./legacy-plugin-warning"
 import { log } from "./logger"
 import { migrateLegacyPluginEntry } from "./migrate-legacy-plugin-entry"
 import { toCanonicalEntry } from "./plugin-entry-migrator"
-import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "./plugin-identity"
+import { LEGACY_PACKAGE_NAME, LEGACY_PLUGIN_NAME, PACKAGE_NAME } from "./plugin-identity"
 
 type LogLegacyPluginStartupWarningDeps = {
   checkForLegacyPluginEntry?: typeof checkForLegacyPluginEntry
@@ -29,8 +29,8 @@ export function logLegacyPluginStartupWarning(deps: LogLegacyPluginStartupWarnin
   })
 
   console.warn(
-    `[oh-my-openagent] WARNING: Your opencode.json uses the legacy package name "${LEGACY_PLUGIN_NAME}".`
-    + ` The package has been renamed to "${PLUGIN_NAME}".`
+    `[oh-my-openagent] WARNING: Your opencode.json uses a legacy package entry such as "${LEGACY_PACKAGE_NAME}" or "${LEGACY_PLUGIN_NAME}".`
+    + ` The package has been renamed to "${PACKAGE_NAME}".`
     + ` Attempting auto-migration...`,
   )
 

@@ -4,8 +4,8 @@ import { applyEdits, modify } from "jsonc-parser"
 
 import { parseJsoncSafe } from "./jsonc-parser"
 import { log } from "./logger"
-import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "./plugin-identity"
-import { isCanonicalEntry, isLegacyEntry, toCanonicalEntry } from "./plugin-entry-migrator"
+import { LEGACY_PACKAGE_NAME, LEGACY_PLUGIN_NAME, PACKAGE_NAME } from "./plugin-identity"
+import { dedupePluginEntries, isCanonicalEntry, isLegacyEntry, toCanonicalEntry } from "./plugin-entry-migrator"
 
 interface OpenCodeConfig {
   plugin?: string[]
@@ -15,10 +15,10 @@ function normalizePluginEntries(entries: string[]): string[] {
   const hasCanonical = entries.some(isCanonicalEntry)
 
   if (hasCanonical) {
-    return entries.filter((entry) => !isLegacyEntry(entry))
+    return dedupePluginEntries(entries.filter((entry) => !isLegacyEntry(entry)))
   }
 
-  return entries.map((entry) => (isLegacyEntry(entry) ? toCanonicalEntry(entry) : entry))
+  return dedupePluginEntries(entries.map((entry) => (isLegacyEntry(entry) ? toCanonicalEntry(entry) : entry)))
 }
 
 function updateJsoncPluginArray(content: string, pluginEntries: string[]): string | null {
@@ -40,7 +40,7 @@ export function migrateLegacyPluginEntry(configPath: string): boolean {
 
   try {
     const content = readFileSync(configPath, "utf-8")
-    if (!content.includes(LEGACY_PLUGIN_NAME)) return false
+    if (!content.includes(LEGACY_PLUGIN_NAME) && !content.includes(LEGACY_PACKAGE_NAME)) return false
 
     const parseResult = parseJsoncSafe<OpenCodeConfig>(content)
     const pluginEntries = parseResult.data?.plugin
@@ -62,11 +62,11 @@ export function migrateLegacyPluginEntry(configPath: string): boolean {
     }
 
     renameSync(tempPath, configPath)
-    log("[migrateLegacyPluginEntry] Auto-migrated opencode.json plugin entry", {
-      configPath,
-      from: LEGACY_PLUGIN_NAME,
-      to: PLUGIN_NAME,
-    })
+      log("[migrateLegacyPluginEntry] Auto-migrated opencode.json plugin entry", {
+        configPath,
+        from: `${LEGACY_PACKAGE_NAME} | ${LEGACY_PLUGIN_NAME}`,
+        to: PACKAGE_NAME,
+      })
     return true
   } catch (error) {
     log("[migrateLegacyPluginEntry] Failed to migrate opencode.json", { configPath, error })
