@@ -1,0 +1,19 @@
+export * from "./features/research-artifacts"
+export * from "./features/research-bibliography"
+export * from "./features/research-knowledge-graph"
+export * from "./features/research-manuscript"
+export * from "./features/research-obsidian"
+export * from "./features/research-reproducibility"
+export * from "./features/research-verification"
+export * from "./features/research-workflow"
+
+export type {
+  OhMyResearchConfig,
+  AgentOverrideConfig,
+  AgentOverrides,
+  BuiltinCommandName,
+  HookName,
+  McpName,
+} from "./config"
+
+export type { ConfigLoadError } from "./shared/config-errors"
