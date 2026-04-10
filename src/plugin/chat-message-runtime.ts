@@ -37,13 +37,6 @@ export function createChatMessageHandler(args: {
       }
     }
   }
-  const isRuntimeFallbackEnabled =
-    hooks.runtimeFallback !== null &&
-    hooks.runtimeFallback !== undefined &&
-    (typeof pluginConfig.runtime_fallback === "boolean"
-      ? pluginConfig.runtime_fallback
-      : (pluginConfig.runtime_fallback?.enabled ?? false))
-
   return async (input, output): Promise<void> => {
     if (input.agent) {
       setSessionAgent(input.sessionID, input.agent)
@@ -57,10 +50,6 @@ export function createChatMessageHandler(args: {
     const storedMainSessionModel = getStoredMainSessionModel(input, pluginConfig, isFirstMessage, output)
     if (storedMainSessionModel) {
       output.message["model"] = storedMainSessionModel
-    }
-
-    if (!isRuntimeFallbackEnabled) {
-      await hooks.modelFallback?.["chat.message"]?.(input, output)
     }
 
     const modelOverride = output.message["model"]
@@ -81,7 +70,6 @@ export function createChatMessageHandler(args: {
 
     await hooks.stopContinuationGuard?.["chat.message"]?.(input)
     await hooks.backgroundNotificationHook?.["chat.message"]?.(input, output)
-    await hooks.runtimeFallback?.["chat.message"]?.(input, output)
     await hooks.keywordDetector?.["chat.message"]?.(input, output)
     await hooks.thinkMode?.["chat.message"]?.(input, output)
     await hooks.claudeCodeHooks?.["chat.message"]?.(input, output)

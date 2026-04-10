@@ -50,7 +50,6 @@ export function createEventHookDispatcher(hooks: CreatedHooks) {
     await runEventHookSafely("rulesInjector", hooks.rulesInjector?.event, input)
     await runEventHookSafely("thinkMode", hooks.thinkMode?.event, input)
     await runEventHookSafely("anthropicContextWindowLimitRecovery", hooks.anthropicContextWindowLimitRecovery?.event, input)
-    await runEventHookSafely("runtimeFallback", hooks.runtimeFallback?.event, input)
     await runEventHookSafely("agentUsageReminder", hooks.agentUsageReminder?.event, input)
     await runEventHookSafely("categorySkillReminder", hooks.categorySkillReminder?.event, input)
     await runEventHookSafely("interactiveBashSession", hooks.interactiveBashSession?.event, input)
