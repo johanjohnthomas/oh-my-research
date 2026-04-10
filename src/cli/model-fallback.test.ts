@@ -602,17 +602,15 @@ describe("generateModelConfig", () => {
   })
 
   describe("schema URL", () => {
-    test("always includes correct schema URL", () => {
+    test("does not include a public schema URL", () => {
       // #given any config
       const config = createConfig()
 
       // #when generateModelConfig is called
       const result = generateModelConfig(config)
 
-      // #then should include correct schema URL
-      expect(result.$schema).toBe(
-        "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json"
-      )
+      // #then should omit schema URL from generated config
+      expect(result.$schema).toBeUndefined()
     })
   })
 })
