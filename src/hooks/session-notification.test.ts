@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, jest, spyOn, test } from "bun:test"
 import { createSessionNotification } from "./session-notification"
-import { setMainSession, subagentSessions, _resetForTesting } from "../features/claude-code-session-state"
+import { setMainSession, subagentSessions, _resetForTesting } from "../features/session-state"
 import * as utils from "./session-notification-utils"
 import * as sender from "./session-notification-sender"
 

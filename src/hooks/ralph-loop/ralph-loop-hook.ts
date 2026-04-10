@@ -1,6 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import type { RalphLoopOptions, RalphLoopState } from "./types"
-import { getTranscriptPath as getDefaultTranscriptPath } from "../claude-code-hooks/transcript"
+import { getTranscriptPath as getDefaultTranscriptPath } from "../host-compatibility/transcript"
 import { createLoopSessionRecovery } from "./loop-session-recovery"
 import { createLoopStateController } from "./loop-state-controller"
 import { createRalphLoopEventHandler } from "./ralph-loop-event-handler"

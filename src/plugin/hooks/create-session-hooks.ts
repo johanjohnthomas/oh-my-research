@@ -1,6 +1,6 @@
-import type { OhMyOpenCodeConfig, HookName } from "../../config"
+import type { OhMyResearchConfig, HookName } from "../../config"
 import type { ModelCacheState } from "../../plugin-state"
-import type { PluginContext } from "../types"
+import type { RuntimeContext } from "../../runtime-context"
 
 import {
   createContextWindowMonitorHook,
@@ -66,8 +66,8 @@ export type SessionHooks = {
 }
 
 export function createSessionHooks(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   modelCacheState: ModelCacheState
   isHookEnabled: (hookName: HookName) => boolean
   safeHookEnabled: boolean

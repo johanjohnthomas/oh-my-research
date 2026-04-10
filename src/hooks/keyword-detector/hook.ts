@@ -6,11 +6,9 @@ import {
   isSystemDirective,
   removeSystemReminders,
 } from "../../shared/system-directive"
-import {
-  getMainSessionID,
-  getSessionAgent,
-  subagentSessions,
-} from "../../features/claude-code-session-state"
+import { getMainSessionID,
+getSessionAgent,
+subagentSessions, } from "../../features/session-state"
 import type { ContextCollector } from "../../features/context-injector"
 import type { RalphLoopHook } from "../ralph-loop"
 import { parseRalphLoopArguments } from "../ralph-loop/command-arguments"

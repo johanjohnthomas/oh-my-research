@@ -9,7 +9,7 @@ import {
   readBoulderState,
 } from "../../features/boulder-state"
 import type { BoulderState } from "../../features/boulder-state"
-import { _resetForTesting, registerAgentName, subagentSessions, updateSessionAgent } from "../../features/claude-code-session-state"
+import { _resetForTesting, registerAgentName, subagentSessions, updateSessionAgent } from "../../features/session-state"
 import type { PendingTaskRef } from "./types"
 
 const TEST_STORAGE_ROOT = join(tmpdir(), `atlas-message-storage-${randomUUID()}`)

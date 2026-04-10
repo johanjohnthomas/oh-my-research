@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, spyOn } from "bun:test"
-import type { OhMyOpenCodeConfig } from "../../config"
+import type { OhMyResearchConfig } from "../../config"
 import type { ModelCacheState } from "../../plugin-state"
 import type { PluginContext } from "../types"
 import * as hooks from "../../hooks"

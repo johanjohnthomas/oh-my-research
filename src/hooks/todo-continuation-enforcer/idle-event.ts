@@ -1,6 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import type { BackgroundManager } from "../../features/background-agent"
-import { getSessionAgent } from "../../features/claude-code-session-state"
+import { getSessionAgent } from "../../features/session-state"
 import { normalizeSDKResponse } from "../../shared"
 import { log } from "../../shared/logger"
 import { getAgentConfigKey } from "../../shared/agent-display-names"

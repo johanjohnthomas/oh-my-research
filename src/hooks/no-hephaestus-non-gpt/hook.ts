@@ -1,10 +1,8 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import { isGptModel } from "../../agents/types"
-import {
-  getSessionAgent,
-  resolveRegisteredAgentName,
-  updateSessionAgent,
-} from "../../features/claude-code-session-state"
+import { getSessionAgent,
+resolveRegisteredAgentName,
+updateSessionAgent, } from "../../features/session-state"
 import { log } from "../../shared"
 import { getAgentConfigKey } from "../../shared/agent-display-names"
 

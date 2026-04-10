@@ -11,11 +11,9 @@ import {
   clearBoulderState,
 } from "../../features/boulder-state"
 import { log } from "../../shared/logger"
-import {
-  isAgentRegistered,
-  resolveRegisteredAgentName,
-  updateSessionAgent,
-} from "../../features/claude-code-session-state"
+import { isAgentRegistered,
+resolveRegisteredAgentName,
+updateSessionAgent, } from "../../features/session-state"
 import { detectWorktreePath } from "./worktree-detector"
 import { parseUserRequest } from "./parse-user-request"
 import { buildStartWorkContextInfo } from "./context-info-builder"

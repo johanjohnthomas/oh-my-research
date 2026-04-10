@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto"
 import type { PluginInput } from "@opencode-ai/plugin"
 import { createAtlasHook } from "./atlas-hook"
 import { clearBoulderState, writeBoulderState } from "../../features/boulder-state"
-import { _resetForTesting, registerAgentName, setSessionAgent } from "../../features/claude-code-session-state"
+import { _resetForTesting, registerAgentName, setSessionAgent } from "../../features/session-state"
 
 // Force process isolation in CI runner (globalThis.setTimeout override conflicts with other atlas tests)
 mock.module("../../shared/opencode-storage-detection", () => ({

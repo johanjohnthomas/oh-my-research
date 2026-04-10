@@ -1,14 +1,14 @@
-import type { HookName, OhMyOpenCodeConfig } from "../../config"
-import type { PluginContext } from "../types"
+import type { HookName, OhMyResearchConfig } from "../../config"
 import type { ModelCacheState } from "../../plugin-state"
+import type { RuntimeContext } from "../../runtime-context"
 
 import { createSessionHooks } from "./create-session-hooks"
 import { createToolGuardHooks } from "./create-tool-guard-hooks"
 import { createTransformHooks } from "./create-transform-hooks"
 
 export function createCoreHooks(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   modelCacheState: ModelCacheState
   isHookEnabled: (hookName: HookName) => boolean
   safeHookEnabled: boolean

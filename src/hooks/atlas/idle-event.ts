@@ -5,7 +5,7 @@ import {
   readBoulderState,
   readCurrentTopLevelTask,
 } from "../../features/boulder-state"
-import { getSessionAgent } from "../../features/claude-code-session-state"
+import { getSessionAgent } from "../../features/session-state"
 import { getLastAgentFromSession } from "./session-last-agent"
 import { isSessionInBoulderLineage } from "./boulder-session-lineage"
 import { getAgentConfigKey } from "../../shared/agent-display-names"

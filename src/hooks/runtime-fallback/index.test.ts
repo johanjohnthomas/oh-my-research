@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach, afterEach, spyOn } from "bun:test"
 import { createRuntimeFallbackHook } from "./index"
-import type { RuntimeFallbackConfig, OhMyOpenCodeConfig } from "../../config"
+import type { RuntimeFallbackConfig, OhMyResearchConfig } from "../../config"
 import * as sharedModule from "../../shared"
 import { SessionCategoryRegistry } from "../../shared/session-category-registry"
 

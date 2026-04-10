@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { createKeywordDetectorHook } from "./index"
-import { _resetForTesting, setMainSession } from "../../features/claude-code-session-state"
+import { _resetForTesting, setMainSession } from "../../features/session-state"
 
 function createMockPluginInput(toastMessages: string[]) {
   return {

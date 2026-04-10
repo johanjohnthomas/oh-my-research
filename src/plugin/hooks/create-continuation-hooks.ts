@@ -1,6 +1,6 @@
-import type { HookName, OhMyOpenCodeConfig } from "../../config"
+import type { HookName, OhMyResearchConfig } from "../../config"
 import type { BackgroundManager } from "../../features/background-agent"
-import type { PluginContext } from "../types"
+import type { RuntimeContext } from "../../runtime-context"
 
 import {
   createTodoContinuationEnforcer,
@@ -29,8 +29,8 @@ type SessionRecovery = {
 } | null
 
 export function createContinuationHooks(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   isHookEnabled: (hookName: HookName) => boolean
   safeHookEnabled: boolean
   backgroundManager: BackgroundManager

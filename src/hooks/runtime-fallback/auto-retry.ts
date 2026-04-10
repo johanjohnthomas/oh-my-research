@@ -2,14 +2,14 @@ import type { HookDeps, RuntimeFallbackTimeout } from "./types"
 import { HOOK_NAME } from "./constants"
 import { log } from "../../shared/logger"
 import { normalizeAgentName, resolveAgentForSession } from "./agent-resolver"
-import { getSessionAgent } from "../../features/claude-code-session-state"
+import { getSessionAgent } from "../../features/session-state"
 import { getFallbackModelsForSession } from "./fallback-models"
 import { prepareFallback } from "./fallback-state"
 import { SessionCategoryRegistry } from "../../shared/session-category-registry"
 import { buildRetryModelPayload } from "./retry-model-payload"
 import { getLastUserRetryParts } from "./last-user-retry-parts"
 import { extractSessionMessages } from "./session-messages"
-import { resolveRegisteredAgentName } from "../../features/claude-code-session-state"
+import { resolveRegisteredAgentName } from "../../features/session-state"
 
 const SESSION_TTL_MS = 30 * 60 * 1000
 

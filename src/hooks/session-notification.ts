@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin"
-import { subagentSessions, getMainSessionID } from "../features/claude-code-session-state"
+import { subagentSessions, getMainSessionID } from "../features/session-state"
 import {
   startBackgroundCheck,
 } from "./session-notification-utils"

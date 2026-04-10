@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach, afterEach } from "bun:test"
 import { createKeywordDetectorHook } from "./index"
-import { _resetForTesting, setMainSession } from "../../features/claude-code-session-state"
+import { _resetForTesting, setMainSession } from "../../features/session-state"
 
 type StartLoopCall = {
   sessionID: string

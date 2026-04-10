@@ -1,7 +1,7 @@
 import type { AvailableSkill } from "../../agents/dynamic-agent-prompt-builder"
-import type { HookName, OhMyOpenCodeConfig } from "../../config"
+import type { HookName, OhMyResearchConfig } from "../../config"
 import type { LoadedSkill } from "../../features/opencode-skill-loader/types"
-import type { PluginContext } from "../types"
+import type { RuntimeContext } from "../../runtime-context"
 
 import { createAutoSlashCommandHook, createCategorySkillReminderHook } from "../../hooks"
 import { safeCreateHook } from "../../shared/safe-create-hook"
@@ -12,8 +12,8 @@ export type SkillHooks = {
 }
 
 export function createSkillHooks(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   isHookEnabled: (hookName: HookName) => boolean
   safeHookEnabled: boolean
   mergedSkills: LoadedSkill[]

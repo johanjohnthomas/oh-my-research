@@ -1,6 +1,6 @@
-import type { HookName, OhMyOpenCodeConfig } from "../../config"
+import type { HookName, OhMyResearchConfig } from "../../config"
 import type { ModelCacheState } from "../../plugin-state"
-import type { PluginContext } from "../types"
+import type { RuntimeContext } from "../../runtime-context"
 
 import {
   createCommentCheckerHooks,
@@ -44,8 +44,8 @@ export type ToolGuardHooks = {
 }
 
 export function createToolGuardHooks(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   modelCacheState: ModelCacheState
   isHookEnabled: (hookName: HookName) => boolean
   safeHookEnabled: boolean

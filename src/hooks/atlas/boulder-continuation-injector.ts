@@ -1,9 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import type { BackgroundManager } from "../../features/background-agent"
-import {
-  isAgentRegistered,
-  resolveRegisteredAgentName,
-} from "../../features/claude-code-session-state"
+import { isAgentRegistered,
+resolveRegisteredAgentName, } from "../../features/session-state"
 import { log } from "../../shared/logger"
 import { createInternalAgentTextPart, resolveInheritedPromptTools } from "../../shared"
 import { HOOK_NAME } from "./hook-name"
