@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test"
 import { applyToolConfig } from "./tool-config-handler"
-import type { OhMyOpenCodeConfig } from "../config"
+import type { OhMyResearchConfig } from "../config"
 
 function createParams(overrides: {
   taskSystem?: boolean

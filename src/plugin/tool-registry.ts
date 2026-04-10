@@ -1,12 +1,14 @@
 import type { ToolDefinition } from "@opencode-ai/plugin"
 import type { SkillLoadOptions } from "../tools/skill/types"
+import type { RuntimeContext } from "../runtime-context"
 
 import type {
   AvailableCategory,
+  AvailableTool,
 } from "../agents/dynamic-agent-prompt-builder"
-import type { OhMyOpenCodeConfig } from "../config"
+import type { OhMyResearchConfig } from "../config"
 import { isInteractiveBashEnabled } from "../create-runtime-tmux-config"
-import type { PluginContext, ToolsRecord } from "./types"
+import type { ToolsRecord } from "./types"
 
 import {
   builtinTools,
@@ -28,7 +30,8 @@ import {
   createTaskUpdateTool,
   createHashlineEditTool,
 } from "../tools"
-import { getMainSessionID } from "../features/claude-code-session-state"
+import { addResearchToolAliases, addResearchToolDefinitions } from "../features/research-runtime-registry"
+import { getMainSessionID } from "../features/session-state"
 import { filterDisabledTools } from "../shared/disabled-tools"
 import { isTaskSystemEnabled, log } from "../shared"
 
@@ -39,9 +42,15 @@ import { normalizeToolArgSchemas } from "./normalize-tool-arg-schemas"
 export type ToolRegistryResult = {
   filteredTools: ToolsRecord
   taskSystemEnabled: boolean
+  availableTools: AvailableTool[]
 }
 
 const LOW_PRIORITY_TOOL_ORDER = [
+  "research_artifact_glob",
+  "research_artifact_search",
+  "research_session_lookup",
+  "research_skill_lookup",
+  "research_delegate",
   "session_list",
   "session_read",
   "session_search",
@@ -99,8 +108,8 @@ export function trimToolsToCap(filteredTools: ToolsRecord, maxTools: number): vo
 }
 
 export function createToolRegistry(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   managers: Pick<Managers, "backgroundManager" | "tmuxSessionManager" | "skillMcpManager">
   skillContext: SkillContext
   availableCategories: AvailableCategory[]
@@ -180,7 +189,7 @@ export function createToolRegistry(args: {
     getSessionID: getSessionIDForMcp,
     gitMasterConfig: pluginConfig.git_master,
     browserProvider: skillContext.browserProvider,
-    nativeSkills: "skills" in ctx ? (ctx as { skills: SkillLoadOptions["nativeSkills"] }).skills : undefined,
+    nativeSkills: ctx.skills,
   })
 
   const taskSystemEnabled = isTaskSystemEnabled(pluginConfig)
@@ -226,8 +235,32 @@ export function createToolRegistry(args: {
     trimToolsToCap(filteredTools, maxTools)
   }
 
+  const filteredToolsWithAliases: ToolsRecord = addResearchToolDefinitions(filteredTools)
+  if (maxTools) {
+    trimToolsToCap(filteredToolsWithAliases, maxTools)
+  }
+
+  const availableTools = addResearchToolAliases(
+    Object.keys(filteredToolsWithAliases).map((toolName): AvailableTool => ({
+      name: toolName,
+      category:
+        toolName.startsWith("lsp_")
+          ? "lsp"
+          : toolName.startsWith("ast_")
+            ? "ast"
+            : toolName.includes("session")
+              ? "session"
+              : toolName === "skill" || toolName === "skill_mcp" || toolName === "task"
+                ? "command"
+                : toolName === "grep" || toolName === "glob"
+                  ? "search"
+                  : "other",
+    })),
+  )
+
   return {
-    filteredTools,
+    filteredTools: filteredToolsWithAliases,
     taskSystemEnabled,
+    availableTools,
   }
 }

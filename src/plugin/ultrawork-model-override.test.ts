@@ -6,7 +6,7 @@ import {
 } from "./ultrawork-model-override"
 import * as sharedModule from "../shared"
 import * as dbOverrideModule from "./ultrawork-db-model-override"
-import * as sessionStateModule from "../features/claude-code-session-state"
+import * as sessionStateModule from "../features/session-state"
 
 describe("detectUltrawork", () => {
   test("should detect ultrawork keyword", () => {

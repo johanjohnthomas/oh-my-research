@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test"
 
-import type { OhMyOpenCodeConfig } from "../config"
+import type { OhMyResearchConfig } from "../config"
 import { createConfigHandler } from "./config-handler"
 import * as agentConfigHandler from "./agent-config-handler"
 import * as commandConfigHandler from "./command-config-handler"

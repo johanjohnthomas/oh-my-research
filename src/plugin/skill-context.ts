@@ -1,5 +1,5 @@
 import type { AvailableSkill } from "../agents/dynamic-agent-prompt-builder"
-import type { OhMyOpenCodeConfig } from "../config"
+import type { OhMyResearchConfig } from "../config"
 import type { BrowserAutomationProvider } from "../config/schema/browser-automation"
 import type {
   LoadedSkill,
@@ -8,8 +8,8 @@ import type {
 
 import {
   discoverConfigSourceSkills,
-  discoverUserClaudeSkills,
-  discoverProjectClaudeSkills,
+  discoverUserHostSkills,
+  discoverProjectHostSkills,
   discoverOpencodeGlobalSkills,
   discoverOpencodeProjectSkills,
   discoverProjectAgentsSkills,
@@ -17,7 +17,8 @@ import {
   mergeSkills,
 } from "../features/opencode-skill-loader"
 import { createBuiltinSkills } from "../features/builtin-skills"
-import { getSystemMcpServerNames } from "../features/claude-code-mcp-loader"
+import { getSystemMcpServerNames } from "../features/host-mcp-loader"
+import { addResearchSkillAliases } from "../features/research-runtime-registry"
 
 export type SkillContext = {
   mergedSkills: LoadedSkill[]
@@ -49,7 +50,7 @@ function filterProviderGatedSkills(
 
 export async function createSkillContext(args: {
   directory: string
-  pluginConfig: OhMyOpenCodeConfig
+  pluginConfig: OhMyResearchConfig
 }): Promise<SkillContext> {
   const { directory, pluginConfig } = args
 
@@ -78,9 +79,9 @@ export async function createSkillContext(args: {
         config: pluginConfig.skills,
         configDir: directory,
       }),
-      includeClaudeSkills ? discoverUserClaudeSkills() : Promise.resolve([]),
+      includeClaudeSkills ? discoverUserHostSkills() : Promise.resolve([]),
       discoverOpencodeGlobalSkills(),
-      includeClaudeSkills ? discoverProjectClaudeSkills(directory) : Promise.resolve([]),
+      includeClaudeSkills ? discoverProjectHostSkills(directory) : Promise.resolve([]),
       discoverOpencodeProjectSkills(directory),
       discoverProjectAgentsSkills(directory),
       discoverGlobalAgentsSkills(),
@@ -117,11 +118,11 @@ export async function createSkillContext(args: {
     { configDir: directory },
   )
 
-  const availableSkills: AvailableSkill[] = mergedSkills.map((skill) => ({
+  const availableSkills: AvailableSkill[] = addResearchSkillAliases(mergedSkills.map((skill) => ({
     name: skill.name,
     description: skill.definition.description ?? "",
     location: mapScopeToLocation(skill.scope),
-  }))
+  })))
 
   return {
     mergedSkills,

@@ -3,7 +3,7 @@
 import { describe, test, expect, spyOn, beforeEach, afterEach } from "bun:test"
 import { resolveCategoryConfig, createConfigHandler } from "./config-handler"
 import type { CategoryConfig } from "../config/schema"
-import type { OhMyOpenCodeConfig } from "../config"
+import type { OhMyResearchConfig } from "../config"
 import { getAgentDisplayName, getAgentDisplayName } from "../shared/agent-display-names"
 
 import * as agents from "../agents"

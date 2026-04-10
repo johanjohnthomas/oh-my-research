@@ -1,4 +1,4 @@
-import type { OhMyOpenCodeConfig } from "../config";
+import type { OhMyResearchConfig } from "../config";
 import {
   getAgentConfigKey,
   getAgentDisplayName,
@@ -8,7 +8,7 @@ import {
   loadProjectCommands,
   loadOpencodeGlobalCommands,
   loadOpencodeProjectCommands,
-} from "../features/claude-code-command-loader";
+} from "../features/host-command-loader";
 import { loadBuiltinCommands } from "../features/builtin-commands";
 import {
   discoverConfigSourceSkills,
@@ -29,7 +29,7 @@ import type { PluginComponents } from "./plugin-components-loader";
 
 export async function applyCommandConfig(params: {
   config: Record<string, unknown>;
-  pluginConfig: OhMyOpenCodeConfig;
+  pluginConfig: OhMyResearchConfig;
   ctx: { directory: string };
   pluginComponents: PluginComponents;
 }): Promise<void> {

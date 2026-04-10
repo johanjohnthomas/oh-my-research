@@ -1,58 +1,19 @@
-# src/plugin-handlers/ — 6-Phase Config Loading Pipeline
+# src/plugin-handlers/ — Transitional Host/Plugin Integration Layer
 
-**Generated:** 2026-04-05
+## Current Reality
 
-## OVERVIEW
+These handlers still connect the runtime to the host/plugin surface inherited from the original harness.
 
-14 non-test files implementing the `ConfigHandler` — the `config` hook handler. Executes 6 sequential phases to register agents, tools, MCPs, and commands with OpenCode.
+## Research-First Boundary
 
-## 6-PHASE PIPELINE
+The current research-first operator story does **not** treat this directory as the main user-facing surface. Instead, the supported operator path is defined by the CLI and the canonical `.research/` artifact workflow.
 
-| Phase | Handler | Purpose |
-|-------|---------|---------|
-| 1 | `applyProviderConfig` | Cache model context limits, detect anthropic-beta headers |
-| 2 | `loadPluginComponents` | Discover Claude Code plugins (10s timeout, error isolation) |
-| 3 | `applyAgentConfig` | Load agents from 5 sources, skill discovery, plan demotion |
-| 4 | `applyToolConfig` | Agent-specific tool permissions |
-| 5 | `applyMcpConfig` | Merge builtin + CC + plugin MCPs |
-| 6 | `applyCommandConfig` | Merge commands/skills from 9 parallel sources |
+## What This Directory Still Does
 
-## FILES
+- config handling for host/plugin integration
+- command/agent/plugin component loading
+- MCP and skill-related host glue
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `config-handler.ts` | ~200 | Main orchestrator, 6-phase sequential |
-| `plugin-components-loader.ts` | ~100 | CC plugin discovery (10s timeout) |
-| `agent-config-handler.ts` | ~300 | Agent loading + skill discovery from 5 sources |
-| `mcp-config-handler.ts` | ~150 | Builtin + CC + plugin MCP merge |
-| `command-config-handler.ts` | ~200 | 9 parallel sources for commands/skills |
-| `tool-config-handler.ts` | ~100 | Agent-specific tool grants/denials |
-| `provider-config-handler.ts` | ~80 | Provider config + model cache |
-| `prometheus-agent-config-builder.ts` | ~100 | Prometheus config with model resolution |
-| `plan-model-inheritance.ts` | 28 | Plan demotion logic |
-| `agent-priority-order.ts` | ~30 | sisyphus, hephaestus, prometheus, atlas first |
-| `agent-key-remapper.ts` | ~30 | Agent key → display name |
-| `category-config-resolver.ts` | ~40 | User vs default category lookup |
-| `index.ts` | ~10 | Barrel exports |
+## Transition Note
 
-## TOOL PERMISSIONS
-
-| Agent | Granted | Denied |
-|-------|---------|--------|
-| Librarian | grep_app_* | — |
-| Atlas, Sisyphus, Prometheus | task, task_*, teammate | — |
-| Hephaestus | task | — |
-| Default (all others) | — | grep_app_*, task_*, teammate, LSP |
-
-## MULTI-LEVEL CONFIG MERGE
-
-```
-User (~/.config/opencode/oh-my-opencode.jsonc)
-  ↓ deepMerge
-Project (.opencode/oh-my-opencode.jsonc)
-  ↓ Zod defaults
-Final Config
-```
-
-- `agents`, `categories`, `claude_code`: deep merged
-- `disabled_*` arrays: Set union
+This directory remains under active extraction. When modifying it, prefer changes that reduce host/plugin coupling and move implementation ownership toward the host-neutral `host-*` surfaces.

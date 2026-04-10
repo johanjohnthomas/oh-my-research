@@ -1,20 +1,20 @@
 import { createBuiltinAgents } from "../agents";
 import { createSisyphusJuniorAgentWithOverrides } from "../agents/sisyphus-junior";
-import type { OhMyOpenCodeConfig } from "../config";
+import type { OhMyResearchConfig } from "../config";
 import { isTaskSystemEnabled, log, migrateAgentConfig } from "../shared";
 import { AGENT_NAME_MAP } from "../shared/migration";
 import { getAgentDisplayName } from "../shared/agent-display-names";
-import { registerAgentName } from "../features/claude-code-session-state";
+import { registerAgentName } from "../features/session-state";
 import {
   discoverConfigSourceSkills,
   discoverGlobalAgentsSkills,
   discoverOpencodeGlobalSkills,
   discoverOpencodeProjectSkills,
   discoverProjectAgentsSkills,
-  discoverProjectClaudeSkills,
-  discoverUserClaudeSkills,
+  discoverProjectHostSkills,
+  discoverUserHostSkills,
 } from "../features/opencode-skill-loader";
-import { loadProjectAgents, loadUserAgents } from "../features/claude-code-agent-loader";
+import { loadProjectAgents, loadUserAgents } from "../features/host-agent-loader";
 import type { PluginComponents } from "./plugin-components-loader";
 import { reorderAgentsByPriority } from "./agent-priority-order";
 import { remapAgentKeysToDisplayNames } from "./agent-key-remapper";
@@ -40,7 +40,7 @@ function getConfiguredDefaultAgent(config: Record<string, unknown>): string | un
 
 export async function applyAgentConfig(params: {
   config: Record<string, unknown>;
-  pluginConfig: OhMyOpenCodeConfig;
+  pluginConfig: OhMyResearchConfig;
   ctx: { directory: string; client?: any };
   pluginComponents: PluginComponents;
 }): Promise<Record<string, unknown>> {
@@ -64,9 +64,9 @@ export async function applyAgentConfig(params: {
       config: params.pluginConfig.skills,
       configDir: params.ctx.directory,
     }),
-    includeClaudeSkillsForAwareness ? discoverUserClaudeSkills() : Promise.resolve([]),
+    includeClaudeSkillsForAwareness ? discoverUserHostSkills() : Promise.resolve([]),
     includeClaudeSkillsForAwareness
-       ? discoverProjectClaudeSkills(params.ctx.directory)
+       ? discoverProjectHostSkills(params.ctx.directory)
        : Promise.resolve([]),
     includeClaudeSkillsForAwareness
       ? discoverProjectAgentsSkills(params.ctx.directory)

@@ -1,7 +1,7 @@
 /// <reference types="bun-types" />
 
 import { describe, test, expect, spyOn, beforeEach, afterEach } from "bun:test"
-import type { OhMyOpenCodeConfig } from "../config"
+import type { OhMyResearchConfig } from "../config"
 
 import * as mcpLoader from "../features/claude-code-mcp-loader"
 import * as mcpModule from "../mcp"
