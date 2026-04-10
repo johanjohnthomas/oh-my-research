@@ -1,41 +1,40 @@
-# src/ — Plugin Source
+# src/ — Runtime and Research Workflow Source
 
-**Generated:** 2026-04-05
+## Current Reality
 
-## OVERVIEW
+This tree still contains both:
 
-Entry point `index.ts` orchestrates 5-step initialization: loadConfig → createManagers → createTools → createHooks → createPluginInterface.
+- the research-first workflow/runtime now exposed as the package root via `src/research-runtime.ts`
+- compatibility/host integration code retained during the extraction from the original agent harness
 
-## KEY FILES
+## Primary Research-First Surfaces
 
-| File | Purpose |
-|------|---------|
-| `index.ts` | Plugin entry, exports `OhMyOpenCodePlugin` |
-| `plugin-config.ts` | JSONC parse, multi-level merge, Zod v4 validation |
-| `create-managers.ts` | TmuxSessionManager, BackgroundManager, SkillMcpManager, ConfigHandler |
-| `create-tools.ts` | SkillContext + AvailableCategories + ToolRegistry (26 tools) |
-| `create-hooks.ts` | 3-tier: Core(43) + Continuation(7) + Skill(2) = 52 hooks |
-| `plugin-interface.ts` | 10 OpenCode hook handlers: config, tool, chat.message, chat.params, chat.headers, event, tool.execute.before, tool.execute.after, experimental.chat.messages.transform, experimental.session.compacting |
+The most important current implementation areas are:
 
-## CONFIG LOADING
+- `src/research-runtime.ts`
+- `src/features/research-artifacts/`
+- `src/features/research-workflow/`
+- `src/features/research-bibliography/`
+- `src/features/research-manuscript/`
+- `src/features/research-verification/`
+- `src/features/research-obsidian/`
+- `src/features/research-knowledge-graph/`
+- `src/features/research-reproducibility/`
 
-```
-loadPluginConfig(directory, ctx)
-  1. User: ~/.config/opencode/oh-my-opencode.jsonc
-  2. Project: .opencode/oh-my-opencode.jsonc
-  3. mergeConfigs(user, project) → deepMerge for agents/categories, Set union for disabled_*
-  4. Zod safeParse → defaults for omitted fields
-  5. migrateConfigFile() → legacy key transformation
-```
+## Transitional Host Surfaces
 
-## HOOK COMPOSITION
+The following areas still exist because runtime extraction is not fully complete yet:
 
-```
-createHooks()
-  ├─→ createCoreHooks()           # 43 hooks
-  │   ├─ createSessionHooks()     # 24: contextWindowMonitor, thinkMode, ralphLoop, modelFallback, runtimeFallback, noSisyphusGpt, noHephaestusNonGpt, anthropicEffort, intentGate, legacyPluginToast...
-  │   ├─ createToolGuardHooks()   # 14: commentChecker, rulesInjector, writeExistingFileGuard, jsonErrorRecovery, hashlineReadEnhancer, bashFileReadGuard, readImageResizer, todoDescriptionOverride, webfetchRedirectGuard...
-  │   └─ createTransformHooks()   # 5: claudeCodeHooks, keywordDetector, contextInjector, thinkingBlockValidator, toolPairValidator
-  ├─→ createContinuationHooks()   # 7: todoContinuationEnforcer, atlas, stopContinuationGuard, compactionContextInjector...
-  └─→ createSkillHooks()          # 2: categorySkillReminder, autoSlashCommand
-```
+- `src/index.ts` (plugin-compatible entrypoint)
+- `src/plugin-interface.ts`
+- `src/create-{managers,tools,hooks}.ts`
+- compatibility loader/hook trees under `src/features/claude-code-*` and `src/hooks/claude-code-hooks/`
+
+## Source of Truth
+
+Prefer the research-first docs and plan over older harness assumptions:
+
+- `README.md`
+- `docs/reference/cli.md`
+- `docs/guide/installation.md`
+- `.sisyphus/plans/research-first-remake.md`
