@@ -1,6 +1,4 @@
 import { Command } from "commander"
-import { run } from "./run"
-import type { RunOptions } from "./run"
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { runFixtureResearchWorkflow, runResearchWorkspaceWorkflow } from "../features/research-workflow"
 import { createFixtureResearchWorkspace, createStarterResearchWorkspace } from "../features/research-workflow/fixture-workspace"
@@ -13,19 +11,6 @@ import { getResearchRole } from "../features/research-workflow/roles"
 import packageJson from "../../package.json" with { type: "json" }
 
 const VERSION = packageJson.version
-
-interface RunCommandOptions {
-  agent?: string
-  model?: string
-  directory?: string
-  port?: number
-  attach?: string
-  onComplete?: string
-  json?: boolean
-  timestamp?: boolean
-  verbose?: boolean
-  sessionId?: string
-}
 
 interface DirectoryOption {
   directory?: string
@@ -123,64 +108,23 @@ function writeDerivedRoleArtifact(directory: string, roleName: "obsidian" | "kno
   return outputPath
 }
 
-const program = new Command()
+export function createCliProgram(): Command {
+  const program = new Command()
 
-program
-  .name("oh-my-research")
-  .description("Local-first research workflow runner for evidence-backed LaTeX paper development")
-  .version(VERSION, "-v, --version", "Show version number")
-  .enablePositionalOptions()
+  program
+    .name("oh-my-research")
+    .description("Local-first research workflow runner for evidence-backed LaTeX paper development")
+    .version(VERSION, "-v, --version", "Show version number")
+    .enablePositionalOptions()
 
-program
-  .command("run <message>")
-  .allowUnknownOption()
-  .passThroughOptions()
-  .description("Transitional host/runtime session entrypoint during the remake")
-  .option("-a, --agent <name>", "Agent to use for the research session")
-  .option("-m, --model <provider/model>", "Model override (e.g., anthropic/claude-sonnet-4)")
-  .option("-d, --directory <path>", "Working directory")
-  .option("-p, --port <port>", "Server port (attaches if port already in use)", Number.parseInt)
-  .option("--attach <url>", "Attach to an existing session server URL")
-  .option("--on-complete <command>", "Shell command to run after completion")
-  .option("--json", "Output structured JSON result to stdout")
-  .option("--no-timestamp", "Disable timestamp prefix in run output")
-  .option("--verbose", "Show full event stream (default: messages/tools only)")
-  .option("--session-id <id>", "Resume existing session instead of creating new one")
-  .addHelpText("after", `
-Examples:
-  $ bun run src/cli/index.ts run "Draft the introduction section"
-  $ bun run src/cli/index.ts run --session-id ses_abc123 "Continue the paper workflow"
-`)
-  .action(async (message: string, options: RunCommandOptions) => {
-    if (options.port && options.attach) {
-      console.error("Error: --port and --attach are mutually exclusive")
-      process.exit(1)
-    }
-    const runOptions: RunOptions = {
-      message,
-      agent: options.agent,
-      model: options.model,
-      directory: options.directory,
-      port: options.port,
-      attach: options.attach,
-      onComplete: options.onComplete,
-      json: options.json ?? false,
-      timestamp: options.timestamp ?? true,
-      verbose: options.verbose ?? false,
-      sessionId: options.sessionId,
-    }
-    const exitCode = await run(runOptions)
-    process.exit(exitCode)
-  })
-
-program
+  program
   .command("version")
   .description("Show version information")
   .action(() => {
     console.log(`oh-my-research v${VERSION}`)
   })
 
-program
+  program
   .command("fixture-run")
   .description("Run the built-in local research-paper fixture workflow and emit workspace.json")
   .option("-d, --directory <path>", "Working directory", process.cwd())
@@ -193,7 +137,7 @@ program
     console.log("Fixture workflow completed")
   })
 
-program
+  program
   .command("workspace-init")
   .description("Create a starter workspace.json for a new paper")
   .requiredOption("--title <title>", "Paper title")
@@ -211,7 +155,7 @@ program
     console.log("workspace.json created")
   })
 
-program
+  program
   .command("workspace-run")
   .description("Run or resume the research workflow for a supplied workspace JSON file")
   .requiredOption("-w, --workspace <path>", "Workspace JSON file")
@@ -226,7 +170,7 @@ program
     console.log("Workspace workflow completed")
   })
 
-program
+  program
   .command("zotero-sync")
   .description("Sync references from Zotero and emit canonical bibliography artifacts")
   .requiredOption("--library-type <users|groups>", "Zotero library type")
@@ -255,7 +199,7 @@ program
     console.log(bibliography.bibPath)
   })
 
-program
+  program
   .command("obsidian-export")
   .description("Export a workspace JSON file to local Obsidian markdown artifacts")
   .requiredOption("-w, --workspace <path>", "Workspace JSON file")
@@ -270,7 +214,7 @@ program
     console.log(result.vaultPath)
   })
 
-program
+  program
   .command("obsidian-open")
   .description("Create an Obsidian open URI for one of the generated research notes")
   .requiredOption("--vault <name>", "Obsidian vault name")
@@ -286,7 +230,7 @@ program
     console.log(createObsidianOpenUri(options.vault, notePath))
   })
 
-program
+  program
   .command("kg-build")
   .description("Build a local derived knowledge graph from a workspace JSON file")
   .requiredOption("-w, --workspace <path>", "Workspace JSON file")
@@ -303,7 +247,7 @@ program
     console.log(outputPath)
   })
 
-program
+  program
   .command("kg-query")
   .description("Query the local derived knowledge graph for matching nodes and edges")
   .requiredOption("--query <text>", "Query text")
@@ -323,6 +267,9 @@ program
     console.log(JSON.stringify(result, null, 2))
   })
 
+  return program
+}
+
 export function runCli(): void {
-  program.parse()
+  createCliProgram().parse()
 }
