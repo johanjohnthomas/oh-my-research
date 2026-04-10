@@ -15,6 +15,12 @@ describe("test workflows", () => {
 
       expect(workflow).toContain("- name: Run tests")
       expect(workflow).toMatch(/run: bun (test|run script\/run-ci-tests\.ts)/)
+      expect(workflow).toContain("dist/research-runtime.js")
+      expect(workflow).toContain("dist/research-runtime.d.ts")
+      expect(workflow).toContain("dist/cli/index.js")
+      expect(workflow).toContain("bun run verify:product")
+      expect(workflow).not.toContain("dist/index.js")
+      expect(workflow).not.toContain("dist/index.d.ts")
     }
   })
 })
