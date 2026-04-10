@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "bun:test"
 
 import { createEventHandler } from "./event"
 import { createChatMessageHandler } from "./chat-message"
-import { _resetForTesting, setMainSession } from "../features/claude-code-session-state"
+import { _resetForTesting, setMainSession } from "../features/session-state"
 import { clearPendingModelFallback, createModelFallbackHook } from "../hooks/model-fallback/hook"
 import { getSessionPromptParams, setSessionPromptParams } from "../shared/session-prompt-params-state"
 
@@ -91,7 +91,7 @@ afterEach(() => {
 			} as any,
 			hooks: {
 				autoUpdateChecker: { event: mockDispatchToHooks as any },
-				claudeCodeHooks: { event: async () => {} },
+        claudeCodeHooks: { event: async () => {} },
 				backgroundNotificationHook: { event: async () => {} },
 				sessionNotification: async () => {},
 				todoContinuationEnforcer: { handler: async () => {} },
@@ -168,7 +168,7 @@ afterEach(() => {
 			} as any,
 			hooks: {
 				autoUpdateChecker: { event: mockDispatchToHooks as any },
-				claudeCodeHooks: { event: async () => {} },
+        claudeCodeHooks: { event: async () => {} },
 				backgroundNotificationHook: { event: async () => {} },
 				sessionNotification: async () => {},
 				todoContinuationEnforcer: { handler: async () => {} },
@@ -238,7 +238,7 @@ afterEach(() => {
 			} as any,
 			hooks: {
 				autoUpdateChecker: { event: async () => {} },
-				claudeCodeHooks: { event: async () => {} },
+        claudeCodeHooks: { event: async () => {} },
 				backgroundNotificationHook: { event: async () => {} },
 				sessionNotification: async () => {},
 				todoContinuationEnforcer: { handler: async () => {} },
@@ -331,7 +331,7 @@ afterEach(() => {
 						dispatchCalls.push(input)
 					},
 				},
-				claudeCodeHooks: { event: async () => {} },
+        claudeCodeHooks: { event: async () => {} },
 				backgroundNotificationHook: { event: async () => {} },
 				sessionNotification: async () => {},
 				todoContinuationEnforcer: { handler: async () => {} },
@@ -389,7 +389,7 @@ afterEach(() => {
 						}
 					},
 				},
-				claudeCodeHooks: { event: async () => {} },
+        claudeCodeHooks: { event: async () => {} },
 				backgroundNotificationHook: { event: async () => {} },
 				sessionNotification: async () => {},
 				todoContinuationEnforcer: { handler: async () => {} },
@@ -641,11 +641,11 @@ describe("createEventHandler - event forwarding", () => {
 		}))
 
 		//#then
-		expect(forwardedEvents.length).toBe(1)
-		expect(forwardedEvents[0]?.event.type).toBe("session.deleted")
-		expect(disconnectedSessions).toEqual([sessionID])
-		expect(deletedSessions).toEqual([sessionID])
-	})
+    expect(forwardedEvents.length).toBe(1)
+    expect(forwardedEvents[0]?.event.type).toBe("session.deleted")
+    expect(disconnectedSessions).toEqual([sessionID])
+    expect(deletedSessions).toEqual([sessionID])
+  })
 
 	it("clears stored prompt params on session.deleted", async () => {
 		//#given
@@ -747,7 +747,7 @@ describe("createEventHandler - retry dedupe lifecycle", () => {
 				modelFallback,
 				stopContinuationGuard: null,
 				keywordDetector: null,
-				claudeCodeHooks: null,
+        claudeCodeHooks: null,
 				autoSlashCommand: null,
 				startWork: null,
 				ralphLoop: null,
