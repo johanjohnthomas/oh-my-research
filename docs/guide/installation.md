@@ -1,6 +1,24 @@
-# Setup
+# Installation
 
-The current repository is a development-time research workflow project, not a published installer-driven plugin product.
+Install the published CLI.
+
+First install Bun and confirm it is available on your `PATH`:
+
+```bash
+bun --version
+```
+
+Then install the package:
+
+```bash
+npm install -g oh-my-research
+```
+
+Then verify the installed command:
+
+```bash
+oh-my-research --help
+```
 
 ## Local Development Setup
 
@@ -24,7 +42,7 @@ bun run verify:product
 Check the available CLI commands:
 
 ```bash
-bun run src/cli/index.ts --help
+oh-my-research --help
 ```
 
 ## Quick Start
@@ -32,19 +50,19 @@ bun run src/cli/index.ts --help
 Initialize a starter paper workspace:
 
 ```bash
-bun run src/cli/index.ts workspace-init --title "My Paper" --directory /tmp/research-paper
+oh-my-research workspace-init --title "My Paper" --directory /tmp/research-paper
 ```
 
 Then run the workflow against that workspace bundle:
 
 ```bash
-bun run src/cli/index.ts workspace-run --workspace /tmp/research-paper/workspace.json --directory /tmp/research-paper
+oh-my-research workspace-run --workspace /tmp/research-paper/workspace.json --directory /tmp/research-paper
 ```
 
 If you need to intentionally restart from the beginning instead of resuming from saved workflow state:
 
 ```bash
-bun run src/cli/index.ts workspace-run --workspace /tmp/research-paper/workspace.json --directory /tmp/research-paper --reset-state
+oh-my-research workspace-run --workspace /tmp/research-paper/workspace.json --directory /tmp/research-paper --reset-state
 ```
 
 ## Fixture Path
@@ -52,7 +70,7 @@ bun run src/cli/index.ts workspace-run --workspace /tmp/research-paper/workspace
 Run the built-in local paper workflow fixture:
 
 ```bash
-bun run src/cli/index.ts fixture-run --directory /tmp/research-fixture
+oh-my-research fixture-run --directory /tmp/research-fixture
 ```
 
 Then inspect the emitted artifacts under:
@@ -65,7 +83,7 @@ Then inspect the emitted artifacts under:
 To rerun the workflow against an existing workspace bundle:
 
 ```bash
-bun run src/cli/index.ts workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+oh-my-research workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
 ```
 
 By default, `workspace-run` resumes from saved workflow state. Use `--reset-state` when you want an intentional full rerun from `ingest`.
@@ -77,7 +95,7 @@ Important outputs include verification reports, workflow state, build outputs, p
 To sync real references from Zotero into the canonical bibliography artifacts, run:
 
 ```bash
-bun run src/cli/index.ts zotero-sync --library-type users --library-id <your-library-id> --api-key <your-zotero-api-key> --directory /tmp/research-fixture --workspace /tmp/research-fixture/workspace.json
+oh-my-research zotero-sync --library-type users --library-id <your-library-id> --api-key <your-zotero-api-key> --directory /tmp/research-fixture --workspace /tmp/research-fixture/workspace.json
 ```
 
 Use credentials and a library ID that you actually control or can read. The command is meant for real Zotero access, not as an anonymous public example.
@@ -87,10 +105,10 @@ Use credentials and a library ID that you actually control or can read. The comm
 Once you have a workspace JSON file matching the canonical research artifact schema, you can run:
 
 ```bash
-bun run src/cli/index.ts obsidian-export --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
-bun run src/cli/index.ts obsidian-open --vault ResearchVault --note claims --directory /tmp/research-fixture
-bun run src/cli/index.ts kg-build --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
-bun run src/cli/index.ts kg-query --directory /tmp/research-fixture --query claim
+oh-my-research obsidian-export --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+oh-my-research obsidian-open --vault ResearchVault --note claims --directory /tmp/research-fixture
+oh-my-research kg-build --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+oh-my-research kg-query --directory /tmp/research-fixture --query claim
 ```
 
 The emitted `workspace.json` is a reusable export bundle derived from the canonical `.research/` artifact tree.
@@ -99,4 +117,4 @@ Derived commands also update run metadata and export manifest coverage for the g
 
 ## Current Status
 
-Legacy installer, doctor, publish, and plugin-registration documentation from the original codebase is no longer authoritative for this remake. Use the research-first CLI reference in `docs/reference/cli.md` and the execution plan in `.sisyphus/plans/research-first-remake.md` instead.
+Legacy installer, doctor, publish, and plugin-registration documentation from the original codebase is no longer part of the released operator surface. Use the research-first CLI reference in `docs/reference/cli.md` instead.

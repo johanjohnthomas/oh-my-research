@@ -1,11 +1,11 @@
 # CLI Reference
 
-Reference for the current `oh-my-research` CLI.
+Reference for the installed `oh-my-research` CLI.
 
 ## Basic Usage
 
 ```bash
-bun run src/cli/index.ts --help
+oh-my-research --help
 ```
 
 For a full product smoke path, use:
@@ -18,7 +18,6 @@ bun run verify:product
 
 | Command | Description |
 | --- | --- |
-| `run <message>` | Transitional host/runtime session entrypoint |
 | `version` | Show version information |
 | `workspace-init` | Create a starter workspace JSON file for a new paper |
 | `fixture-run` | Execute the built-in single-paper local workflow fixture |
@@ -29,37 +28,12 @@ bun run verify:product
 | `kg-build` | Build a local derived knowledge graph from a workspace JSON file |
 | `kg-query` | Query the local derived knowledge graph |
 
-## run
-
-Runs a transitional host/runtime session entrypoint that still exists during the remake.
-
-This command is broader than the primary single-paper research workflow and should not be treated as the main v1 operator path.
-
-```bash
-bun run src/cli/index.ts run "Continue the paper workflow"
-```
-
-### Options
-
-| Option | Description |
-| --- | --- |
-| `-a, --agent <name>` | Agent to use for the research session |
-| `-m, --model <provider/model>` | Model override |
-| `-d, --directory <path>` | Working directory |
-| `-p, --port <port>` | Server port |
-| `--attach <url>` | Attach to an existing session server URL |
-| `--on-complete <command>` | Shell command to run after completion |
-| `--json` | Output structured JSON |
-| `--no-timestamp` | Disable timestamp prefix |
-| `--verbose` | Show full event stream |
-| `--session-id <id>` | Resume an existing session |
-
 ## workspace-init
 
 Creates a starter `workspace.json` bundle for a new paper.
 
 ```bash
-bun run src/cli/index.ts workspace-init --title "My Paper" --directory /tmp/research-paper
+oh-my-research workspace-init --title "My Paper" --directory /tmp/research-paper
 ```
 
 The resulting workspace bundle is intended to be the input for `workspace-run`, `zotero-sync`, `obsidian-export`, and `kg-build`.
@@ -69,7 +43,7 @@ The resulting workspace bundle is intended to be the input for `workspace-run`, 
 Runs the built-in local single-paper workflow fixture. This is the fastest way to verify the current artifact, workflow, manuscript, verification, and reproducibility plumbing.
 
 ```bash
-bun run src/cli/index.ts fixture-run --directory /tmp/research-fixture
+oh-my-research fixture-run --directory /tmp/research-fixture
 ```
 
 Expected outputs under the chosen directory include:
@@ -94,25 +68,25 @@ Expected outputs under the chosen directory include:
 Runs or resumes the same research workflow against a supplied workspace JSON file instead of the built-in fixture.
 
 ```bash
-bun run src/cli/index.ts workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+oh-my-research workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
 ```
 
 To intentionally restart from the beginning instead of resuming from `.research/workflow/state.json`:
 
 ```bash
-bun run src/cli/index.ts workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture --reset-state
+oh-my-research workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture --reset-state
 ```
 
 This command refreshes the canonical `.research/` artifact tree and rewrites `workspace.json` with the resulting run metadata and verification outputs.
 
-Unlike the transitional `run <message>` surface, `workspace-run` is the deterministic research-workflow operator path over a supplied workspace bundle.
+`workspace-run` is the deterministic research-workflow operator path over a supplied workspace bundle.
 
 ## zotero-sync
 
 Fetches references from the Zotero Web API and writes canonical bibliography artifacts.
 
 ```bash
-bun run src/cli/index.ts zotero-sync --library-type users --library-id <your-library-id> --api-key <your-zotero-api-key> --directory /tmp/research-fixture --workspace /tmp/research-fixture/workspace.json
+oh-my-research zotero-sync --library-type users --library-id <your-library-id> --api-key <your-zotero-api-key> --directory /tmp/research-fixture --workspace /tmp/research-fixture/workspace.json
 ```
 
 This command requires access to a real Zotero library. Use your own library ID and, when needed, a valid API key with permission to read that library.
@@ -144,7 +118,7 @@ Exports canonical workspace data to local Obsidian-friendly markdown notes.
 The simplest input path is the `workspace.json` emitted by `fixture-run`.
 
 ```bash
-bun run src/cli/index.ts obsidian-export --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+oh-my-research obsidian-export --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
 ```
 
 Expected outputs:
@@ -164,7 +138,7 @@ Creates an Obsidian URI for one of the exported notes.
 This command fails if the requested note has not been exported yet.
 
 ```bash
-bun run src/cli/index.ts obsidian-open --vault ResearchVault --note claims --directory /tmp/research-fixture
+oh-my-research obsidian-open --vault ResearchVault --note claims --directory /tmp/research-fixture
 ```
 
 Expected result:
@@ -179,7 +153,7 @@ Builds a local derived knowledge graph from a workspace JSON file.
 The simplest input path is the `workspace.json` emitted by `fixture-run`.
 
 ```bash
-bun run src/cli/index.ts kg-build --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+oh-my-research kg-build --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
 ```
 
 Expected output:
@@ -194,7 +168,7 @@ The corresponding `workspace.json` run metadata is refreshed as well.
 Queries the local derived knowledge graph for matching nodes and connected edges.
 
 ```bash
-bun run src/cli/index.ts kg-query --directory /tmp/research-fixture --query claim
+oh-my-research kg-query --directory /tmp/research-fixture --query claim
 ```
 
 Expected result:
@@ -207,5 +181,5 @@ Expected result:
 Shows the current CLI version.
 
 ```bash
-bun run src/cli/index.ts version
+oh-my-research version
 ```
