@@ -1,6 +1,6 @@
 # Features Reference
 
-This repository is in a research-first remake phase. The authoritative feature set is the local paper workflow currently implemented in `src/features/research-*` and exposed through the CLI commands documented in `docs/reference/cli.md`.
+The authoritative feature set is the local paper workflow implemented in `src/features/research-*` and exposed through the CLI commands documented in `docs/reference/cli.md`.
 
 ## Current Research Workflow Features
 
@@ -44,6 +44,4 @@ Derived artifacts are kept separate under `.research/derived/`.
 - Obsidian markdown export under `.research/derived/obsidian/`
 - derived knowledge graph output under `.research/derived/knowledge-graph/`
 
-## Transition Note
-
-Legacy OpenCode/OpenAgent feature docs from the original codebase are not authoritative for this remake. If a feature is not represented in the current CLI reference, README, or `src/features/research-*` implementation, do not treat it as part of the supported research workflow.
+If a feature is not represented in the current CLI reference, README, or `src/features/research-*` implementation, do not treat it as part of the supported research workflow.
