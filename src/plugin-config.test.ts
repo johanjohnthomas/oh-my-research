@@ -4,12 +4,12 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import * as shared from "./shared"
 import { loadPluginConfig, mergeConfigs, parseConfigPartially } from "./plugin-config";
-import { OhMyOpenCodeConfigSchema, type OhMyOpenCodeConfig } from "./config";
+import { OhMyResearchConfigSchema, type OhMyOpenCodeConfig } from "./config";
 
 const tempDirs: string[] = []
 
 function createConfig(config: Partial<OhMyOpenCodeConfig>): OhMyOpenCodeConfig {
-  return OhMyOpenCodeConfigSchema.parse(config)
+  return OhMyResearchConfigSchema.parse(config)
 }
 
 afterEach(() => {
@@ -160,7 +160,7 @@ describe("parseConfigPartially", () => {
     //#then should accept the hook name so runtime and schema stay aligned
 
     it("should accept unknown disabled_hooks values for forward compatibility", () => {
-      const result = OhMyOpenCodeConfigSchema.safeParse({
+      const result = OhMyResearchConfigSchema.safeParse({
         disabled_hooks: ["future-hook-name"],
       });
 
@@ -309,15 +309,15 @@ describe("loadPluginConfig", () => {
     mkdirSync(projectConfigDir, { recursive: true })
 
     writeFileSync(
-      join(userConfigDir, "oh-my-openagent.jsonc"),
+      join(userConfigDir, "oh-my-research.jsonc"),
       JSON.stringify({ mcp_env_allowlist: ["USER_ONLY_TOKEN"] })
     )
     writeFileSync(
-      join(projectConfigDir, "oh-my-openagent.jsonc"),
+      join(projectConfigDir, "oh-my-research.jsonc"),
       JSON.stringify({ mcp_env_allowlist: ["PROJECT_TOKEN"] })
     )
 
-    spyOn(shared, "getOpenCodeConfigDir").mockReturnValue(userConfigDir)
+    process.env.OPENCODE_CONFIG_DIR = userConfigDir
 
     // when
     const config = loadPluginConfig(projectDir, {})
@@ -334,14 +334,14 @@ describe("loadPluginConfig", () => {
     const projectConfigDir = join(projectDir, ".opencode")
     const legacyConfigPath = join(projectConfigDir, "oh-my-opencode.jsonc")
     const backupConfigPath = `${legacyConfigPath}.bak`
-    const canonicalConfigPath = join(projectConfigDir, "oh-my-openagent.jsonc")
+    const canonicalConfigPath = join(projectConfigDir, "oh-my-research.jsonc")
 
     tempDirs.push(rootDir)
     mkdirSync(userConfigDir, { recursive: true })
     mkdirSync(projectConfigDir, { recursive: true })
     writeFileSync(legacyConfigPath, JSON.stringify({ agents: { oracle: { model: "openai/gpt-5.4" } } }))
 
-    spyOn(shared, "getOpenCodeConfigDir").mockReturnValue(userConfigDir)
+    process.env.OPENCODE_CONFIG_DIR = userConfigDir
 
     // when
     loadPluginConfig(projectDir, {})
@@ -374,7 +374,7 @@ describe("loadPluginConfig", () => {
       chmodSync(projectConfigDir, 0o555)
     }
 
-    spyOn(shared, "getOpenCodeConfigDir").mockReturnValue(userConfigDir)
+    process.env.OPENCODE_CONFIG_DIR = userConfigDir
 
     // when
     let config: OhMyOpenCodeConfig
@@ -398,14 +398,14 @@ describe("loadPluginConfig", () => {
     const projectDir = join(rootDir, "project")
     const projectConfigDir = join(projectDir, ".opencode")
     const legacyConfigPath = join(projectConfigDir, "oh-my-opencode.jsonc")
-    const canonicalConfigPath = join(projectConfigDir, "oh-my-openagent.jsonc")
+    const canonicalConfigPath = join(projectConfigDir, "oh-my-research.jsonc")
 
     tempDirs.push(rootDir)
     mkdirSync(userConfigDir, { recursive: true })
     mkdirSync(projectConfigDir, { recursive: true })
     writeFileSync(legacyConfigPath, JSON.stringify({ agents: { oracle: { model: "openai/gpt-5.4" } } }))
 
-    spyOn(shared, "getOpenCodeConfigDir").mockReturnValue(userConfigDir)
+    process.env.OPENCODE_CONFIG_DIR = userConfigDir
 
     // when
     const config = loadPluginConfig(projectDir, {})

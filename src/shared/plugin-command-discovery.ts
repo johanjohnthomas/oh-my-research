@@ -1,9 +1,4 @@
-import {
-  discoverInstalledPlugins,
-  loadPluginCommands,
-  loadPluginSkillsAsCommands,
-} from "../features/claude-code-plugin-loader"
-import type { CommandDefinition } from "../features/claude-code-command-loader/types"
+import { discoverHostCommandDefinitions } from "./host-command-discovery"
 
 export interface PluginCommandDiscoveryOptions {
   pluginsEnabled?: boolean
@@ -12,17 +7,6 @@ export interface PluginCommandDiscoveryOptions {
 
 export function discoverPluginCommandDefinitions(
   options?: PluginCommandDiscoveryOptions,
-): Record<string, CommandDefinition> {
-  if (options?.pluginsEnabled === false) {
-    return {}
-  }
-
-  const { plugins } = discoverInstalledPlugins({
-    enabledPluginsOverride: options?.enabledPluginsOverride,
-  })
-
-  return {
-    ...loadPluginCommands(plugins),
-    ...loadPluginSkillsAsCommands(plugins),
-  }
+) {
+  return discoverHostCommandDefinitions(options)
 }

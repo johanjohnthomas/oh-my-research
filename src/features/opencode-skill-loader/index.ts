@@ -15,3 +15,7 @@ export * from "./skill-resolution-options"
 export * from "./loaded-skill-template-extractor"
 export * from "./skill-template-resolver"
 export * from "./config-source-discovery"
+export {
+  discoverUserClaudeSkills as discoverUserHostSkills,
+  discoverProjectClaudeSkills as discoverProjectHostSkills,
+} from "./loader"

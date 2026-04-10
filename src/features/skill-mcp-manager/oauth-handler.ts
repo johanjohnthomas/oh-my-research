@@ -1,4 +1,4 @@
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpServer } from "../host-mcp-loader"
 import { McpOAuthProvider } from "../mcp-oauth/provider"
 import { withRefreshMutex } from "../mcp-oauth/refresh-mutex"
 import type { OAuthTokenData } from "../mcp-oauth/storage"

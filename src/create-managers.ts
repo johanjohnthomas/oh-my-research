@@ -1,6 +1,7 @@
-import type { OhMyOpenCodeConfig } from "./config"
+import type { OhMyResearchConfig } from "./config"
 import type { ModelCacheState } from "./plugin-state"
-import type { PluginContext, TmuxConfig } from "./plugin/types"
+import type { TmuxConfig } from "./plugin/types"
+import type { RuntimeContext } from "./runtime-context"
 
 import type { SubagentSessionCreatedEvent } from "./features/background-agent"
 import { BackgroundManager } from "./features/background-agent"
@@ -40,8 +41,8 @@ export type Managers = {
 }
 
 export function createManagers(args: {
-  ctx: PluginContext
-  pluginConfig: OhMyOpenCodeConfig
+  ctx: RuntimeContext
+  pluginConfig: OhMyResearchConfig
   tmuxConfig: TmuxConfig
   modelCacheState: ModelCacheState
   backgroundNotificationHookEnabled: boolean

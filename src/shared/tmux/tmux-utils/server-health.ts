@@ -3,6 +3,12 @@ let serverCheckUrl: string | null = null
 
 const SERVER_RUNNING_KEY = Symbol.for("oh-my-opencode:server-running-in-process")
 
+interface ServerHealthDeps {
+	fetchImpl?: typeof fetch
+	ignoreInProcessFlag?: boolean
+	ignoreCache?: boolean
+}
+
 function delay(milliseconds: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }
@@ -15,12 +21,14 @@ function isMarkedRunningInProcess(): boolean {
 	return (globalThis as Record<symbol, boolean>)[SERVER_RUNNING_KEY] === true
 }
 
-export async function isServerRunning(serverUrl: string): Promise<boolean> {
-	if (isMarkedRunningInProcess()) {
+export async function isServerRunning(serverUrl: string, deps?: ServerHealthDeps): Promise<boolean> {
+	const fetchImpl = deps?.fetchImpl ?? fetch
+
+	if (!deps?.ignoreInProcessFlag && isMarkedRunningInProcess()) {
 		return true
 	}
 
-	if (serverCheckUrl === serverUrl && serverAvailable === true) {
+	if (!deps?.ignoreCache && serverCheckUrl === serverUrl && serverAvailable === true) {
 		return true
 	}
 
@@ -33,7 +41,7 @@ export async function isServerRunning(serverUrl: string): Promise<boolean> {
 		const timeout = setTimeout(() => controller.abort(), timeoutMs)
 
 		try {
-			const response = await fetch(healthUrl, {
+			const response = await fetchImpl(healthUrl, {
 				signal: controller.signal,
 			}).catch(() => null)
 			clearTimeout(timeout)
@@ -58,4 +66,5 @@ export async function isServerRunning(serverUrl: string): Promise<boolean> {
 export function resetServerCheck(): void {
 	serverAvailable = null
 	serverCheckUrl = null
+	delete (globalThis as Record<symbol, boolean>)[SERVER_RUNNING_KEY]
 }

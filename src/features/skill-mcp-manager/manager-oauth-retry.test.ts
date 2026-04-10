@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it, mock } from "bun:test"
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpServer } from "../host-mcp-loader"
 import type { OAuthTokenData } from "../mcp-oauth/storage"
 import type { SkillMcpClientInfo, SkillMcpServerContext } from "./types"
 
@@ -15,11 +15,6 @@ const mockGetOrCreateClientWithRetryImpl = mock(async () => ({
 type ManagerModule = typeof import("./manager")
 
 async function importFreshManagerModule(): Promise<ManagerModule> {
-  mock.module("./connection", () => ({
-    getOrCreateClient: mockGetOrCreateClient,
-    getOrCreateClientWithRetryImpl: mockGetOrCreateClientWithRetryImpl,
-  }))
-
   mock.module("../mcp-oauth/provider", () => ({
     McpOAuthProvider: class MockMcpOAuthProvider {},
   }))
@@ -66,6 +61,8 @@ describe("SkillMcpManager post-request OAuth retry", () => {
         login: mock(async () => ({ accessToken: "login-token" } satisfies OAuthTokenData)),
         refresh,
       }),
+      getOrCreateClientImpl: mockGetOrCreateClient,
+      getOrCreateClientWithRetryImpl: mockGetOrCreateClientWithRetryImpl,
     })
     const callTool = mock(async () => {
       if (callTool.mock.calls.length === 1) {
@@ -95,6 +92,8 @@ describe("SkillMcpManager post-request OAuth retry", () => {
         login: mock(async () => ({ accessToken: "login-token" } satisfies OAuthTokenData)),
         refresh,
       }),
+      getOrCreateClientImpl: mockGetOrCreateClient,
+      getOrCreateClientWithRetryImpl: mockGetOrCreateClientWithRetryImpl,
     })
     const callTool = mock(async () => {
       if (callTool.mock.calls.length === 1) {
@@ -126,6 +125,8 @@ describe("SkillMcpManager post-request OAuth retry", () => {
         login: mock(async () => ({ accessToken: "login-token" } satisfies OAuthTokenData)),
         refresh,
       }),
+      getOrCreateClientImpl: mockGetOrCreateClient,
+      getOrCreateClientWithRetryImpl: mockGetOrCreateClientWithRetryImpl,
     })
     const callTool = mock(async () => {
       throw new Error("401 Unauthorized")
@@ -148,6 +149,8 @@ describe("SkillMcpManager post-request OAuth retry", () => {
         login: mock(async () => ({ accessToken: "login-token" } satisfies OAuthTokenData)),
         refresh,
       }),
+      getOrCreateClientImpl: mockGetOrCreateClient,
+      getOrCreateClientWithRetryImpl: mockGetOrCreateClientWithRetryImpl,
     })
     const callTool = mock(async () => {
       throw new Error("401 Unauthorized")

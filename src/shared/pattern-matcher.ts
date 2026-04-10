@@ -1,4 +1,4 @@
-import type { ClaudeHooksConfig, HookMatcher } from "../hooks/claude-code-hooks/types"
+import type { ClaudeHooksConfig, HookMatcher } from "../hooks/host-compatibility/types"
 
 /**
  * Escape all regex special characters EXCEPT asterisk (*).

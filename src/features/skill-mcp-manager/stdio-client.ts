@@ -1,6 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpServer } from "../host-mcp-loader"
 import { createCleanMcpEnvironment } from "./env-cleaner"
 import { registerProcessCleanup, startCleanupTimer } from "./cleanup"
 import { redactSensitiveData } from "./error-redaction"

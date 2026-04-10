@@ -1,6 +1,6 @@
 import type { CallOmoAgentArgs } from "./types"
 import type { PluginInput } from "@opencode-ai/plugin"
-import { subagentSessions, syncSubagentSessions } from "../../features/claude-code-session-state"
+import { subagentSessions, syncSubagentSessions } from "../../features/session-state"
 import { log } from "../../shared"
 
 export async function createOrGetSession(

@@ -13,7 +13,7 @@ import {
   resolveTaskListId,
   sanitizePathSegment,
 } from "./storage"
-import type { OhMyOpenCodeConfig } from "../../config/schema"
+import type { OhMyResearchConfig } from "../../config/schema"
 
 const TEST_DIR = ".test-claude-tasks"
 const TEST_DIR_ABS = join(process.cwd(), TEST_DIR)

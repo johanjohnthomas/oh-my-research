@@ -1,21 +1,33 @@
-import { describe, test, expect, beforeEach, afterEach, mock } from "bun:test"
-import {
-  isInsideTmux,
-  isServerRunning,
-  resetServerCheck,
-  markServerRunningInProcess,
-  spawnTmuxPane,
-  closeTmuxPane,
-  applyLayout,
-} from "./tmux-utils"
+import { describe, test, expect, beforeEach, afterEach } from "bun:test"
 import { isInsideTmuxEnvironment } from "./tmux-utils/environment"
+import { isInsideTmux, spawnTmuxPane, closeTmuxPane, applyLayout } from "./tmux-utils"
+import {
+	isServerRunning,
+	markServerRunningInProcess,
+	resetServerCheck,
+} from "./tmux-utils/server-health"
 
-function createFetchMock(responseFactory: () => Promise<Response>): typeof fetch & ReturnType<typeof mock> {
-  const fetchMock = mock(async (_input: RequestInfo | URL, _init?: RequestInit) => responseFactory())
-  const preconnect = globalThis.fetch.preconnect?.bind(globalThis.fetch)
-  return Object.assign(fetchMock, {
-    preconnect,
-  }) as typeof fetch & ReturnType<typeof mock>
+let serverHealthSequence = Promise.resolve()
+
+function runSerialServerHealthTest<T>(fn: () => Promise<T>): Promise<T> {
+	const run = serverHealthSequence.then(fn, fn)
+	serverHealthSequence = run.then(() => undefined, () => undefined)
+	return run
+}
+
+type FetchMock = typeof fetch & { calls: Array<[RequestInfo | URL, RequestInit | undefined]> }
+
+function createFetchMock(responseFactory: () => Promise<Response>): FetchMock {
+	const calls: Array<[RequestInfo | URL, RequestInit | undefined]> = []
+	const fetchMock = (async (input: RequestInfo | URL, init?: RequestInit) => {
+		calls.push([input, init])
+		return await responseFactory()
+	}) as FetchMock
+	const preconnect = globalThis.fetch.preconnect?.bind(globalThis.fetch)
+	fetchMock.calls = calls
+	return Object.assign(fetchMock, {
+		preconnect,
+	})
 }
 
 describe("isInsideTmux", () => {
@@ -52,7 +64,7 @@ describe("isInsideTmux", () => {
     expect(result).toBe(false)
   })
 
-  test("is exported as a function", () => {
+  test("is exported as a function", async () => {
     // given, #when
     const result = typeof isInsideTmux
 
@@ -64,113 +76,130 @@ describe("isInsideTmux", () => {
 describe("isServerRunning", () => {
   const originalFetch = globalThis.fetch
 
-  beforeEach(() => {
-    resetServerCheck()
-  })
+	beforeEach(() => {
+		resetServerCheck()
+	})
 
   afterEach(() => {
     globalThis.fetch = originalFetch
   })
 
   test("returns true when server responds OK", async () => {
-    // given
-    globalThis.fetch = createFetchMock(async () => new Response(null, { status: 200 }))
+    await runSerialServerHealthTest(async () => {
+      // given
+      const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
+      globalThis.fetch = fetchMock
 
-    // when
-    const result = await isServerRunning("http://localhost:4096")
+      // when
+      const result = await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true, ignoreCache: true })
 
-    // then
-    expect(result).toBe(true)
+      // then
+      expect(result).toBe(true)
+    })
   })
 
   test("returns false when server not reachable", async () => {
-    // given
-    globalThis.fetch = createFetchMock(async () => {
-      throw new Error("ECONNREFUSED")
+    await runSerialServerHealthTest(async () => {
+      // given
+      const fetchMock = createFetchMock(async () => {
+        throw new Error("ECONNREFUSED")
+      })
+      globalThis.fetch = fetchMock
+
+      // when
+      const result = await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true, ignoreCache: true })
+
+      // then
+      expect(result).toBe(false)
     })
-
-    // when
-    const result = await isServerRunning("http://localhost:4096")
-
-    // then
-    expect(result).toBe(false)
   })
 
   test("returns false when fetch returns not ok", async () => {
-    // given
-    globalThis.fetch = createFetchMock(async () => new Response(null, { status: 500 }))
+    await runSerialServerHealthTest(async () => {
+      // given
+      const fetchMock = createFetchMock(async () => new Response(null, { status: 500 }))
+      globalThis.fetch = fetchMock
 
-    // when
-    const result = await isServerRunning("http://localhost:4096")
+      // when
+      const result = await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true, ignoreCache: true })
 
-    // then
-    expect(result).toBe(false)
+      // then
+      expect(result).toBe(false)
+    })
   })
 
   test("caches successful result", async () => {
-    // given
-    const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
-    globalThis.fetch = fetchMock
+    await runSerialServerHealthTest(async () => {
+      // given
+      const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
+      globalThis.fetch = fetchMock
 
-    // when
-    await isServerRunning("http://localhost:4096")
-    await isServerRunning("http://localhost:4096")
+      // when
+      await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true })
+      await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true })
 
-    // then - should only call fetch once due to caching
-    expect(fetchMock.mock.calls.length).toBe(1)
+      // then - should only call fetch once due to caching
+      expect(fetchMock.calls.length).toBe(1)
+    })
   })
 
   test("does not cache failed result", async () => {
-    // given
-    const fetchMock = createFetchMock(async () => {
-      throw new Error("ECONNREFUSED")
+    await runSerialServerHealthTest(async () => {
+      // given
+      const fetchMock = createFetchMock(async () => {
+        throw new Error("ECONNREFUSED")
+      })
+      globalThis.fetch = fetchMock
+
+      // when
+      await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true, ignoreCache: true })
+      await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true, ignoreCache: true })
+
+      // then - should call fetch 4 times (2 attempts per call, 2 calls)
+      expect(fetchMock.calls.length).toBe(4)
     })
-    globalThis.fetch = fetchMock
-
-    // when
-    await isServerRunning("http://localhost:4096")
-    await isServerRunning("http://localhost:4096")
-
-    // then - should call fetch 4 times (2 attempts per call, 2 calls)
-    expect(fetchMock.mock.calls.length).toBe(4)
   })
 
   test("uses different cache for different URLs", async () => {
-    // given
-    const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
-    globalThis.fetch = fetchMock
+    await runSerialServerHealthTest(async () => {
+      // given
+      const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
+      globalThis.fetch = fetchMock
 
-    // when
-    await isServerRunning("http://localhost:4096")
-    await isServerRunning("http://localhost:5000")
+      // when
+      await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true })
+      await isServerRunning("http://localhost:5000", { fetchImpl: fetchMock, ignoreInProcessFlag: true })
 
-    // then - should call fetch twice for different URLs
-    expect(fetchMock.mock.calls.length).toBe(2)
+      // then - should call fetch twice for different URLs
+      expect(fetchMock.calls.length).toBe(2)
+    })
   })
 })
 
 describe("resetServerCheck", () => {
-  test("clears cache without throwing", () => {
+  test("clears cache without throwing", async () => {
     // given, #when, #then
     expect(() => resetServerCheck()).not.toThrow()
   })
 
   test("allows re-checking after reset", async () => {
-    // given
-    const originalFetch = globalThis.fetch
-    const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
-    globalThis.fetch = fetchMock
+    await runSerialServerHealthTest(async () => {
+      // given
+      const originalFetch = globalThis.fetch
+      const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
+      globalThis.fetch = fetchMock
 
-    // when
-    await isServerRunning("http://localhost:4096")
-    resetServerCheck()
-    await isServerRunning("http://localhost:4096")
+      // when
+      await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true })
+      resetServerCheck()
+      await isServerRunning("http://localhost:4096", { fetchImpl: fetchMock, ignoreInProcessFlag: true })
 
-    // then - should call fetch twice after reset
-    expect(fetchMock.mock.calls.length).toBe(2)
+      // then - should call fetch twice after reset
+      expect(fetchMock.calls.length).toBe(2)
 
-    // cleanup
-    globalThis.fetch = originalFetch
+      // cleanup
+      globalThis.fetch = originalFetch
+    })
   })
 })
 
@@ -179,7 +208,6 @@ describe("markServerRunningInProcess", () => {
   const SERVER_RUNNING_KEY = Symbol.for("oh-my-opencode:server-running-in-process")
 
   beforeEach(() => {
-    resetServerCheck()
     delete (globalThis as Record<symbol, boolean>)[SERVER_RUNNING_KEY]
   })
 
@@ -189,28 +217,32 @@ describe("markServerRunningInProcess", () => {
   })
 
   test("skips HTTP fetch when marked as running in-process", async () => {
-    // given
-    const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
-    globalThis.fetch = fetchMock
-    markServerRunningInProcess()
+    await runSerialServerHealthTest(async () => {
+      // given
+      const fetchMock = createFetchMock(async () => new Response(null, { status: 200 }))
+      globalThis.fetch = fetchMock
+      markServerRunningInProcess()
 
-    // when
-    const result = await isServerRunning("http://localhost:4096")
+      // when
+      const result = await isServerRunning("http://localhost:4096")
 
-    // then
-    expect(result).toBe(true)
-    expect(fetchMock.mock.calls.length).toBe(0)
+      // then
+      expect(result).toBe(true)
+      expect(fetchMock.calls.length).toBe(0)
+    })
   })
 
-  test("uses globalThis so flag survives across module instances", () => {
-    // given
-    markServerRunningInProcess()
+  test("uses globalThis so flag survives across module instances", async () => {
+    await runSerialServerHealthTest(async () => {
+      // given
+      markServerRunningInProcess()
 
-    // when
-    const flag = (globalThis as Record<symbol, boolean>)[SERVER_RUNNING_KEY]
+      // when
+      const flag = (globalThis as Record<symbol, boolean>)[SERVER_RUNNING_KEY]
 
-    // then
-    expect(flag).toBe(true)
+      // then
+      expect(flag).toBe(true)
+    })
   })
 })
 

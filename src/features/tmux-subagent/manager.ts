@@ -1,5 +1,5 @@
-import type { PluginInput } from "@opencode-ai/plugin"
 import type { TmuxConfig } from "../../config/schema"
+import type { RuntimeClient, RuntimeContext } from "../../runtime-context"
 import type { TrackedSession, CapacityConfig, WindowState } from "./types"
 import { log, normalizeSDKResponse } from "../../shared"
 import {
@@ -16,7 +16,7 @@ import { decideSpawnActions, decideCloseAction, type SessionMapping } from "./de
 import { executeActions, executeAction } from "./action-executor"
 import { TmuxPollingManager } from "./polling-manager"
 import { createTrackedSession, markTrackedSessionClosePending } from "./tracked-session-state"
-type OpencodeClient = PluginInput["client"]
+type OpencodeClient = RuntimeClient
 
 interface SessionCreatedEvent {
   type: string
@@ -33,11 +33,18 @@ interface DeferredSession {
 export interface TmuxUtilDeps {
   isInsideTmux: () => boolean
   getCurrentPaneId: () => string | undefined
+  spawnTmuxWindow: typeof spawnTmuxWindow
+  spawnTmuxSession: typeof spawnTmuxSession
+  pollIntervalMs?: number
+  sessionReadyPollIntervalMs?: number
+  sessionReadyTimeoutMs?: number
 }
 
 const defaultTmuxDeps: TmuxUtilDeps = {
   isInsideTmux: defaultIsInsideTmux,
   getCurrentPaneId: defaultGetCurrentPaneId,
+  spawnTmuxWindow,
+  spawnTmuxSession,
 }
 
 const DEFERRED_SESSION_TTL_MS = 5 * 60 * 1000
@@ -63,7 +70,7 @@ export class TmuxSessionManager {
   private isolatedContainerPaneId: string | undefined
   private isolatedWindowPaneId: string | undefined
   private isolatedContainerNullStateCount = 0
-  constructor(ctx: PluginInput, tmuxConfig: TmuxConfig, deps: TmuxUtilDeps = defaultTmuxDeps) {
+  constructor(ctx: RuntimeContext, tmuxConfig: TmuxConfig, deps: TmuxUtilDeps = defaultTmuxDeps) {
     this.client = ctx.client
     this.tmuxConfig = tmuxConfig
     this.deps = deps
@@ -148,8 +155,8 @@ export class TmuxSessionManager {
     log("[tmux-session-manager] creating isolated tmux container", { isolation, sessionId, title })
 
     const result = isolation === "session"
-      ? await spawnTmuxSession(sessionId, title, this.tmuxConfig, this.serverUrl, this.sourcePaneId)
-      : await spawnTmuxWindow(sessionId, title, this.tmuxConfig, this.serverUrl)
+      ? await this.deps.spawnTmuxSession(sessionId, title, this.tmuxConfig, this.serverUrl, this.sourcePaneId)
+      : await this.deps.spawnTmuxWindow(sessionId, title, this.tmuxConfig, this.serverUrl)
 
     if (result.success && result.paneId) {
       this.isolatedContainerPaneId = result.paneId
@@ -461,9 +468,9 @@ export class TmuxSessionManager {
           this.deferredAttachTickScheduled = false
         }
       })
-    }, POLL_INTERVAL_BACKGROUND_MS)
+    }, this.deps.pollIntervalMs ?? POLL_INTERVAL_BACKGROUND_MS)
     log("[tmux-session-manager] deferred attach polling started", {
-      intervalMs: POLL_INTERVAL_BACKGROUND_MS,
+      intervalMs: this.deps.pollIntervalMs ?? POLL_INTERVAL_BACKGROUND_MS,
     })
   }
 
@@ -609,7 +616,7 @@ export class TmuxSessionManager {
   private async waitForSessionReady(sessionId: string): Promise<boolean> {
     const startTime = Date.now()
     
-    while (Date.now() - startTime < SESSION_READY_TIMEOUT_MS) {
+    while (Date.now() - startTime < (this.deps.sessionReadyTimeoutMs ?? SESSION_READY_TIMEOUT_MS)) {
       try {
         const statusResult = await this.client.session.status({ path: undefined })
         const allStatuses = normalizeSDKResponse(statusResult, {} as Record<string, { type: string }>)
@@ -626,12 +633,12 @@ export class TmuxSessionManager {
         log("[tmux-session-manager] session status check error", { error: String(err) })
       }
       
-      await new Promise((resolve) => setTimeout(resolve, SESSION_READY_POLL_INTERVAL_MS))
+      await new Promise((resolve) => setTimeout(resolve, this.deps.sessionReadyPollIntervalMs ?? SESSION_READY_POLL_INTERVAL_MS))
     }
     
     log("[tmux-session-manager] session ready timeout", {
       sessionId,
-      timeoutMs: SESSION_READY_TIMEOUT_MS,
+      timeoutMs: this.deps.sessionReadyTimeoutMs ?? SESSION_READY_TIMEOUT_MS,
     })
     return false
   }

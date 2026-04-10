@@ -1,4 +1,4 @@
-import type { ClaudeHookEvent, PluginConfig } from "../hooks/claude-code-hooks/types"
+import type { ClaudeHookEvent, PluginConfig } from "../hooks/host-compatibility/types"
 
 export function isHookDisabled(
   config: PluginConfig,

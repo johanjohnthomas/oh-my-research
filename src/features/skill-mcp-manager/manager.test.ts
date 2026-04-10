@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, afterAll, mock, spyOn } from "bun:test"
 import type { SkillMcpClientInfo, SkillMcpServerContext } from "./types"
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpServer } from "../host-mcp-loader"
 import type { OAuthTokenData } from "../mcp-oauth/storage"
 
 // Mock the MCP SDK transports to avoid network calls

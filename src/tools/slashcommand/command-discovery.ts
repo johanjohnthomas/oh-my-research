@@ -7,7 +7,7 @@ import {
   getOpenCodeCommandDirs,
   discoverPluginCommandDefinitions,
 } from "../../shared"
-import type { CommandFrontmatter } from "../../features/claude-code-command-loader/types"
+import type { CommandFrontmatter } from "../../features/host-command-loader"
 import { isMarkdownFile } from "../../shared/file-utils"
 import { getClaudeConfigDir, log } from "../../shared"
 import { loadBuiltinCommands } from "../../features/builtin-commands"

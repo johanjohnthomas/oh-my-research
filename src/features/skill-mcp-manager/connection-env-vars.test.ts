@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, mock, test } from "bun:test"
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpServer } from "../host-mcp-loader"
 import type { SkillMcpClientInfo, SkillMcpManagerState } from "./types"
 
 const trackedStates: SkillMcpManagerState[] = []

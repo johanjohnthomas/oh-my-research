@@ -1,4 +1,4 @@
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpServer } from "../host-mcp-loader"
 import type { ConnectionType } from "./types"
 
 /**

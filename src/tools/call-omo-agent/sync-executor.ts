@@ -1,6 +1,6 @@
 import type { CallOmoAgentArgs } from "./types"
 import type { PluginInput } from "@opencode-ai/plugin"
-import { subagentSessions, syncSubagentSessions } from "../../features/claude-code-session-state"
+import { subagentSessions, syncSubagentSessions } from "../../features/session-state"
 import { clearSessionFallbackChain, setSessionFallbackChain } from "../../hooks/model-fallback/hook"
 import { getAgentToolRestrictions, log } from "../../shared"
 import { applySessionPromptParams } from "../../shared/session-prompt-params-helpers"

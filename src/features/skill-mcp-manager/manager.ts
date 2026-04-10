@@ -1,9 +1,12 @@
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import type { Prompt, Resource, Tool } from "@modelcontextprotocol/sdk/types.js"
-import type { ClaudeCodeMcpServer } from "../claude-code-mcp-loader/types"
+import type { ClaudeCodeMcpServer } from "../host-mcp-loader"
 import { McpOAuthProvider } from "../mcp-oauth/provider"
 import { disconnectAll, disconnectSession, forceReconnect } from "./cleanup"
-import { getOrCreateClient, getOrCreateClientWithRetryImpl } from "./connection"
+import {
+  getOrCreateClient as defaultGetOrCreateClient,
+  getOrCreateClientWithRetryImpl as defaultGetOrCreateClientWithRetryImpl,
+} from "./connection"
 import { handlePostRequestAuthError, handleStepUpIfNeeded } from "./oauth-handler"
 import type {
   OAuthProviderFactory,
@@ -14,8 +17,14 @@ import type {
 
 export class SkillMcpManager {
   private readonly state: SkillMcpManagerState
+  private readonly getOrCreateClientImpl: typeof defaultGetOrCreateClient
+  private readonly getOrCreateClientWithRetryConnectionImpl: typeof defaultGetOrCreateClientWithRetryImpl
 
-  constructor(options: { createOAuthProvider?: OAuthProviderFactory } = {}) {
+  constructor(options: {
+    createOAuthProvider?: OAuthProviderFactory
+    getOrCreateClientImpl?: typeof defaultGetOrCreateClient
+    getOrCreateClientWithRetryImpl?: typeof defaultGetOrCreateClientWithRetryImpl
+  } = {}) {
     this.state = {
       clients: new Map(),
       pendingConnections: new Map(),
@@ -30,6 +39,9 @@ export class SkillMcpManager {
       disposed: false,
       createOAuthProvider: options.createOAuthProvider ?? ((providerOptions) => new McpOAuthProvider(providerOptions)),
     }
+    this.getOrCreateClientImpl = options.getOrCreateClientImpl ?? defaultGetOrCreateClient
+    this.getOrCreateClientWithRetryConnectionImpl =
+      options.getOrCreateClientWithRetryImpl ?? defaultGetOrCreateClientWithRetryImpl
   }
 
   private getClientKey(info: SkillMcpClientInfo): string {
@@ -38,7 +50,7 @@ export class SkillMcpManager {
 
   async getOrCreateClient(info: SkillMcpClientInfo, config: ClaudeCodeMcpServer): Promise<Client> {
     const clientKey = this.getClientKey(info)
-    return await getOrCreateClient({
+    return await this.getOrCreateClientImpl({
       state: this.state,
       clientKey,
       info,
@@ -160,7 +172,7 @@ export class SkillMcpManager {
   // NOTE: tests spy on this exact method name via `spyOn(manager as any, 'getOrCreateClientWithRetry')`.
   private async getOrCreateClientWithRetry(info: SkillMcpClientInfo, config: ClaudeCodeMcpServer): Promise<Client> {
     const clientKey = this.getClientKey(info)
-    return await getOrCreateClientWithRetryImpl({
+    return await this.getOrCreateClientWithRetryConnectionImpl({
       state: this.state,
       clientKey,
       info,

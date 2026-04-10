@@ -63,6 +63,11 @@ const mockGetCurrentPaneId = mock<() => string | undefined>(() => '%0')
 const mockTmuxDeps: TmuxUtilDeps = {
   isInsideTmux: mockIsInsideTmux,
   getCurrentPaneId: mockGetCurrentPaneId,
+  spawnTmuxWindow: mockSpawnTmuxWindow,
+  spawnTmuxSession: mockSpawnTmuxSession,
+  pollIntervalMs: 10,
+  sessionReadyPollIntervalMs: 10,
+  sessionReadyTimeoutMs: 500,
 }
 
 mock.module('./pane-state-querier', () => ({
@@ -85,22 +90,6 @@ mock.module('./action-executor', () => ({
   executeAction: mockExecuteAction,
   executeActionWithDeps: mockExecuteAction,
 }))
-
-mock.module('../../shared/tmux', () => {
-  const { isInsideTmux, getCurrentPaneId } = require('../../shared/tmux/tmux-utils')
-  const { POLL_INTERVAL_BACKGROUND_MS, SESSION_TIMEOUT_MS, SESSION_MISSING_GRACE_MS } = require('../../shared/tmux/constants')
-  return {
-    isInsideTmux,
-    getCurrentPaneId,
-    POLL_INTERVAL_BACKGROUND_MS,
-    SESSION_TIMEOUT_MS,
-    SESSION_MISSING_GRACE_MS,
-    SESSION_READY_POLL_INTERVAL_MS: 100,
-    SESSION_READY_TIMEOUT_MS: 500,
-    spawnTmuxWindow: mockSpawnTmuxWindow,
-    spawnTmuxSession: mockSpawnTmuxSession,
-  }
-})
 
 const trackedSessions = new Set<string>()
 

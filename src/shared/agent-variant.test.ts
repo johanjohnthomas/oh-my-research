@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { OhMyOpenCodeConfig } from "../config"
+import type { OhMyResearchConfig } from "../config"
 import { applyAgentVariant, resolveAgentVariant, resolveVariantForModel } from "./agent-variant"
 
 describe("resolveAgentVariant", () => {

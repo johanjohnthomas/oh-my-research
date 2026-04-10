@@ -3,7 +3,7 @@ import type { OpencodeClient, OnSubagentSessionCreated, QueueItem } from "./cons
 import { TMUX_CALLBACK_DELAY_MS } from "./constants"
 import { log, getAgentToolRestrictions, promptWithModelSuggestionRetry, createInternalAgentTextPart } from "../../shared"
 import { applySessionPromptParams } from "../../shared/session-prompt-params-helpers"
-import { subagentSessions } from "../claude-code-session-state"
+import { subagentSessions } from "../session-state"
 import { getTaskToastManager } from "../task-toast-manager"
 import { isInsideTmux } from "../../shared/tmux"
 import { stripAgentListSortPrefix } from "../../shared/agent-display-names"

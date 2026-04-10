@@ -8,7 +8,7 @@ import {
   findProjectClaudeSkillDirs,
   findProjectOpencodeSkillDirs,
 } from "../../shared/project-discovery-dirs"
-import type { CommandDefinition } from "../claude-code-command-loader/types"
+import type { CommandDefinition } from "../host-command-loader"
 import type { LoadedSkill } from "./types"
 import { skillsToCommandDefinitionRecord } from "./skill-definition-record"
 import { deduplicateSkillsByName } from "./skill-deduplication"

@@ -1,5 +1,6 @@
 import type { BuiltinSkill } from "./types"
 import type { BrowserAutomationProvider } from "../../config/schema"
+import { normalizeDisabledSkillAliases } from "../research-runtime-registry"
 
 import {
   playwrightSkill,
@@ -30,10 +31,11 @@ export function createBuiltinSkills(options: CreateBuiltinSkillsOptions = {}): B
   }
 
   const skills = [browserSkill, frontendUiUxSkill, gitMasterSkill, devBrowserSkill, reviewWorkSkill, aiSlopRemoverSkill]
+  const normalizedDisabledSkills = disabledSkills ? normalizeDisabledSkillAliases(disabledSkills) : undefined
 
-  if (!disabledSkills) {
+  if (!normalizedDisabledSkills) {
     return skills
   }
 
-  return skills.filter((skill) => !disabledSkills.has(skill.name))
+  return skills.filter((skill) => !normalizedDisabledSkills.has(skill.name))
 }

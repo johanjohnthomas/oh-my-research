@@ -1,59 +1,19 @@
-# src/features/opencode-skill-loader/ — 4-Scope Skill Discovery
+# src/features/opencode-skill-loader/ — Skill Discovery Compatibility Layer
 
-**Generated:** 2026-04-05
+## Current Reality
 
-## OVERVIEW
+This feature still handles discovery/merge behavior across multiple skill locations, including legacy compatibility paths from the original harness.
 
-28 files (~3.2k LOC). Discovers, parses, merges, and resolves SKILL.md files from 4 scopes with priority deduplication.
+## Research-First Expectation
 
-## 4-SCOPE PRIORITY (highest → lowest)
+The current operator-facing research workflow is documented in `README.md` and `docs/reference/cli.md`. This directory should be treated as a transitional compatibility layer that helps the runtime discover skills without defining the product story itself.
 
-```
-1. Project (.opencode/skills/)
-2. OpenCode config (~/.config/opencode/skills/)
-3. User (~/.config/opencode/oh-my-opencode/skills/)
-4. Global (built-in skills)
-```
+## Active Scope
 
-Same-named skill at higher scope overrides lower.
+- config source skill discovery
+- global/project skill discovery
+- merge behavior across available sources
 
-## KEY FILES
+## Transition Note
 
-| File | Purpose |
-|------|---------|
-| `loader.ts` | Main `loadSkills()` — orchestrates discovery → parse → merge |
-| `async-loader.ts` | Async variant for non-blocking skill loading |
-| `blocking.ts` | Sync variant for initial load |
-| `merger.ts` | Priority-based deduplication across scopes |
-| `skill-content.ts` | YAML frontmatter parsing from SKILL.md |
-| `skill-discovery.ts` | Find SKILL.md files in directory trees |
-| `skill-directory-loader.ts` | Load all skills from a single directory |
-| `config-source-discovery.ts` | Discover scope directories from config |
-| `skill-template-resolver.ts` | Variable substitution in skill templates |
-| `skill-mcp-config.ts` | Extract MCP configs from skill YAML |
-| `types.ts` | `LoadedSkill`, `SkillScope`, `SkillDiscoveryResult` |
-
-## SKILL FORMAT (SKILL.md)
-
-```markdown
----
-name: my-skill
-description: What this skill does
-tools: [Bash, Read, Write]
-mcp:
-  - name: my-mcp
-    type: stdio
-    command: npx
-    args: [-y, my-mcp-server]
----
-
-Skill content (instructions for the agent)...
-```
-
-## MERGER SUBDIRECTORY
-
-Handles complex merge logic when skills from multiple scopes have overlapping names or MCP configs.
-
-## TEMPLATE RESOLUTION
-
-Variables like `{{directory}}`, `{{agent}}` in skill content get resolved at load time based on current context.
+Legacy path support may still exist during the extraction, but new work should prefer research-first naming and runtime boundaries.

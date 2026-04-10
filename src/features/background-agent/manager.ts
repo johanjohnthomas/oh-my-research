@@ -1,6 +1,6 @@
 
-import type { PluginInput } from "@opencode-ai/plugin"
 import { isAgentNotFoundError, FALLBACK_AGENT, buildFallbackBody } from "./spawner"
+import type { RuntimeClient, RuntimeContext } from "../../runtime-context"
 import type {
   BackgroundTask,
   LaunchInput,
@@ -32,7 +32,7 @@ import {
   TASK_TTL_MS,
 } from "./constants"
 
-import { subagentSessions } from "../claude-code-session-state"
+import { subagentSessions } from "../session-state"
 import { getTaskToastManager } from "../task-toast-manager"
 import { formatDuration } from "./duration-formatter"
 import {
@@ -79,7 +79,7 @@ import {
   type SubagentSpawnContext,
 } from "./subagent-spawn-limits"
 
-type OpencodeClient = PluginInput["client"]
+type OpencodeClient = RuntimeClient
 
 
 interface MessagePartInfo {
@@ -169,7 +169,7 @@ export class BackgroundManager {
   private cachedCircuitBreakerSettings?: CircuitBreakerSettings
 
   constructor(
-    ctx: PluginInput,
+    ctx: RuntimeContext,
     config?: BackgroundTaskConfig,
     options?: {
       tmuxConfig?: TmuxConfig
