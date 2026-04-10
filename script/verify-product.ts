@@ -1,13 +1,17 @@
-import { mkdtempSync, existsSync, rmSync } from "node:fs"
+import { chmodSync, mkdtempSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { spawnSync } from "node:child_process"
 
-function run(command: string, args: string[], cwd: string) {
+function run(command: string, args: string[], cwd: string, env: Record<string, string> = {}) {
   const result = spawnSync(command, args, {
     cwd,
     encoding: "utf-8",
     stdio: "pipe",
+    env: {
+      ...process.env,
+      ...env,
+    },
   })
 
   if (result.status !== 0) {
@@ -32,6 +36,8 @@ function assertExists(path: string) {
 const repoRoot = process.cwd()
 const workspaceDir = mkdtempSync(join(tmpdir(), "oh-my-research-verify-"))
 const packageDir = mkdtempSync(join(tmpdir(), "oh-my-research-pack-"))
+const opencodeDir = mkdtempSync(join(tmpdir(), "oh-my-research-opencode-"))
+const fakeBinDir = mkdtempSync(join(tmpdir(), "oh-my-research-bin-"))
 
 try {
   run("bun", ["run", "build"], repoRoot)
@@ -55,13 +61,33 @@ try {
 
   run("npm", ["init", "-y"], packageDir)
   run("npm", ["install", `${repoRoot}/${tarball}`], packageDir)
-  run("bun", ["-e", 'import("oh-my-research").then((m)=>console.log(Object.keys(m).length))'], packageDir)
-  run(`${packageDir}/node_modules/.bin/oh-my-research`, ["--help"], packageDir)
+  run("bun", ["-e", 'import("@johanjohnthomas/oh-my-research").then((m)=>console.log(Object.keys(m).length))'], packageDir)
+
+  const fakeOpenCodePath = join(fakeBinDir, "opencode")
+  writeFileSync(fakeOpenCodePath, "#!/bin/sh\necho 1.0.0\n", "utf-8")
+  chmodSync(fakeOpenCodePath, 0o755)
+  mkdirSync(opencodeDir, { recursive: true })
+
+  run(
+    `${packageDir}/node_modules/.bin/oh-my-research`,
+    ["--help"],
+    packageDir,
+    {
+      PATH: `${fakeBinDir}:${process.env.PATH ?? ""}`,
+      OPENCODE_CONFIG_DIR: opencodeDir,
+    },
+  )
+
+  assertExists(`${opencodeDir}/opencode.json`)
+  assertExists(`${opencodeDir}/oh-my-research.json`)
 
   console.log("Product verification completed")
   console.log(`Workspace: ${workspaceDir}`)
   console.log(`Package test: ${packageDir}`)
+  console.log(`OpenCode config: ${opencodeDir}`)
 } finally {
   rmSync(workspaceDir, { recursive: true, force: true })
   rmSync(packageDir, { recursive: true, force: true })
+  rmSync(opencodeDir, { recursive: true, force: true })
+  rmSync(fakeBinDir, { recursive: true, force: true })
 }
