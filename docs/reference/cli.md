@@ -1,403 +1,211 @@
 # CLI Reference
 
-Complete reference for the published `oh-my-opencode` CLI. During the rename transition, OpenCode plugin registration now prefers `oh-my-openagent` inside `opencode.json`.
+Reference for the current `oh-my-research` CLI.
 
 ## Basic Usage
 
 ```bash
-# Display help
-bunx oh-my-opencode
+bun run src/cli/index.ts --help
+```
 
-# Or with npx
-npx oh-my-opencode
+For a full product smoke path, use:
+
+```bash
+bun run verify:product
 ```
 
 ## Commands
 
-| Command                       | Description                                            |
-| ----------------------------- | ------------------------------------------------------ |
-| `install`                     | Interactive setup wizard                               |
-| `doctor`                      | Environment diagnostics and health checks              |
-| `run`                         | OpenCode session runner with task completion enforcement |
-| `get-local-version`           | Display local version information and update check     |
-| `refresh-model-capabilities`  | Refresh the cached models.dev-based model capabilities |
-| `version`                     | Show version information                               |
-| `mcp oauth`                   | MCP OAuth authentication management                    |
+| Command | Description |
+| --- | --- |
+| `run <message>` | Transitional host/runtime session entrypoint |
+| `version` | Show version information |
+| `workspace-init` | Create a starter workspace JSON file for a new paper |
+| `fixture-run` | Execute the built-in single-paper local workflow fixture |
+| `workspace-run` | Execute the research workflow for a supplied workspace JSON file |
+| `zotero-sync` | Sync Zotero references into canonical bibliography artifacts |
+| `obsidian-export` | Export a workspace JSON file to local Obsidian markdown artifacts |
+| `obsidian-open` | Create an Obsidian URI for an exported note |
+| `kg-build` | Build a local derived knowledge graph from a workspace JSON file |
+| `kg-query` | Query the local derived knowledge graph |
 
----
+## run
 
-## install
+Runs a transitional host/runtime session entrypoint that still exists during the remake.
 
-Interactive installation tool for initial Oh My OpenCode setup. Provides a TUI based on `@clack/prompts`.
-
-### Usage
+This command is broader than the primary single-paper research workflow and should not be treated as the main v1 operator path.
 
 ```bash
-bunx oh-my-opencode install
+bun run src/cli/index.ts run "Continue the paper workflow"
 ```
-
-### Installation Process
-
-1. **Subscription Selection**: Choose which providers and subscriptions you actually have
-2. **Plugin Registration**: Registers `oh-my-openagent` in OpenCode settings, or upgrades a legacy `oh-my-opencode` entry during the compatibility window
-3. **Configuration File Creation**: Writes the generated OmO config to `oh-my-opencode.json` in the active OpenCode config directory
-4. **Authentication Hints**: Shows the `opencode auth login` steps for the providers you selected, unless `--skip-auth` is set
 
 ### Options
 
 | Option | Description |
-| ------ | ----------- |
-| `--no-tui` | Run in non-interactive mode without TUI |
-| `--claude <no\|yes\|max20>` | Claude subscription mode |
-| `--openai <no\|yes>` | OpenAI / ChatGPT subscription |
-| `--gemini <no\|yes>` | Gemini integration |
-| `--copilot <no\|yes>` | GitHub Copilot subscription |
-| `--opencode-zen <no\|yes>` | OpenCode Zen access |
-| `--zai-coding-plan <no\|yes>` | Z.ai Coding Plan subscription |
-| `--kimi-for-coding <no\|yes>` | Kimi for Coding subscription |
-| `--opencode-go <no\|yes>` | OpenCode Go subscription |
-| `--skip-auth` | Skip authentication setup hints |
+| --- | --- |
+| `-a, --agent <name>` | Agent to use for the research session |
+| `-m, --model <provider/model>` | Model override |
+| `-d, --directory <path>` | Working directory |
+| `-p, --port <port>` | Server port |
+| `--attach <url>` | Attach to an existing session server URL |
+| `--on-complete <command>` | Shell command to run after completion |
+| `--json` | Output structured JSON |
+| `--no-timestamp` | Disable timestamp prefix |
+| `--verbose` | Show full event stream |
+| `--session-id <id>` | Resume an existing session |
 
----
+## workspace-init
 
-## doctor
-
-Diagnoses your environment to ensure Oh My OpenCode is functioning correctly. The current checks are grouped into system, config, tools, and models.
-
-The doctor command detects common issues including:
-- Legacy plugin entry references in `opencode.json` (warns when `oh-my-opencode` is still used instead of `oh-my-openagent`)
-- Configuration file validity and JSONC parsing errors
-- Model resolution and fallback chain verification
-- Missing or misconfigured MCP servers
-### Usage
+Creates a starter `workspace.json` bundle for a new paper.
 
 ```bash
-bunx oh-my-opencode doctor
+bun run src/cli/index.ts workspace-init --title "My Paper" --directory /tmp/research-paper
 ```
 
-### Diagnostic Categories
+The resulting workspace bundle is intended to be the input for `workspace-run`, `zotero-sync`, `obsidian-export`, and `kg-build`.
 
-| Category          | Check Items                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------ |
-| **System**        | OpenCode binary, version (>= 1.0.150), plugin registration, legacy package name warning |
-| **Config**        | Configuration file validity, JSONC parsing, Zod schema validation                    |
-| **Tools**         | AST-Grep, LSP servers, GitHub CLI, MCP servers                                       |
-| **Models**        | Model capabilities cache, model resolution, agent/category overrides, availability   |
+## fixture-run
+
+Runs the built-in local single-paper workflow fixture. This is the fastest way to verify the current artifact, workflow, manuscript, verification, and reproducibility plumbing.
+
+```bash
+bun run src/cli/index.ts fixture-run --directory /tmp/research-fixture
+```
+
+Expected outputs under the chosen directory include:
+
+- `workspace.json`
+- `.research/references/generated.bib`
+- `.research/references/zotero-export.json`
+- `.research/manuscript/main.tex`
+- `.research/manuscript/build-result.json`
+- `.research/manuscript/build/main.pdf`
+- `.research/manuscript/build/main.log`
+- `.research/runs/run-1/output.json`
+- `.research/verification/report.json`
+- `.research/verification/report.md`
+- `.research/workflow/state.json`
+- `.research/workflow/stage-runs.json`
+- `.research/workflow/error.json` (failure path only)
+- `.research/runs/run-1/metadata.json`
+
+## workspace-run
+
+Runs or resumes the same research workflow against a supplied workspace JSON file instead of the built-in fixture.
+
+```bash
+bun run src/cli/index.ts workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+```
+
+To intentionally restart from the beginning instead of resuming from `.research/workflow/state.json`:
+
+```bash
+bun run src/cli/index.ts workspace-run --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture --reset-state
+```
+
+This command refreshes the canonical `.research/` artifact tree and rewrites `workspace.json` with the resulting run metadata and verification outputs.
+
+Unlike the transitional `run <message>` surface, `workspace-run` is the deterministic research-workflow operator path over a supplied workspace bundle.
+
+## zotero-sync
+
+Fetches references from the Zotero Web API and writes canonical bibliography artifacts.
+
+```bash
+bun run src/cli/index.ts zotero-sync --library-type users --library-id <your-library-id> --api-key <your-zotero-api-key> --directory /tmp/research-fixture --workspace /tmp/research-fixture/workspace.json
+```
+
+This command requires access to a real Zotero library. Use your own library ID and, when needed, a valid API key with permission to read that library.
 
 ### Options
 
-| Option       | Description                               |
-| ------------ | ----------------------------------------- |
-| `--status`   | Show compact system dashboard             |
-| `--verbose`  | Show detailed diagnostic information      |
-| `--json`     | Output results in JSON format             |
+| Option | Description |
+| --- | --- |
+| `--library-type <users|groups>` | Zotero library type |
+| `--library-id <id>` | Zotero library identifier |
+| `-w, --workspace <path>` | Optional workspace JSON file to refresh after sync |
+| `--api-key <key>` | Zotero API key |
+| `--collection-key <key>` | Optional Zotero collection key |
+| `--limit <count>` | Maximum number of items to fetch |
+| `-d, --directory <path>` | Working directory |
 
-### Example Output
+Expected outputs:
 
-```
-oh-my-opencode doctor
+- `.research/references/zotero-export.json`
+- `.research/references/generated.bib`
 
-┌──────────────────────────────────────────────────┐
-│  Oh-My-OpenAgent Doctor                           │
-└──────────────────────────────────────────────────┘
+If `--workspace` is provided, the bibliography section in that workspace bundle is refreshed too.
+- `.research/workflow/error.json` on failed workflow paths that later consume missing artifacts
 
-System
-  ✓ OpenCode version: 1.0.155 (>= 1.0.150)
-  ✓ Plugin registered in opencode.json
+## obsidian-export
 
-Config
-  ✓ oh-my-opencode.jsonc is valid
-  ✓ Model resolution: all agents have valid fallback chains
-  ⚠ categories.visual-engineering: using default model
+Exports canonical workspace data to local Obsidian-friendly markdown notes.
 
-Tools
-  ✓ AST-Grep available
-  ✓ LSP servers configured
-
-Models
-  ✓ 11 agents, 8 categories, 0 overrides
-  ⚠ Some configured models rely on compatibility fallback
-
-Summary: 10 passed, 1 warning, 0 failed
-```
----
-
-## run
-
-Run opencode with todo/background task completion enforcement. Unlike 'opencode run', this command waits until all todos are completed or cancelled, and all child sessions (background tasks) are idle.
-
-### Usage
+The simplest input path is the `workspace.json` emitted by `fixture-run`.
 
 ```bash
-bunx oh-my-opencode run <message>
+bun run src/cli/index.ts obsidian-export --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
 ```
 
-### Options
+Expected outputs:
 
-| Option                | Description                                                         |
-| --------------------- | ------------------------------------------------------------------- |
-| `-a, --agent <name>`  | Agent to use (default: from CLI/env/config, fallback: Sisyphus)     |
-| `-m, --model <provider/model>` | Model override (e.g., anthropic/claude-sonnet-4)             |
-| `-d, --directory <path>` | Working directory                                                |
-| `-p, --port <port>`  | Server port (attaches if port already in use)                       |
-| `--attach <url>`      | Attach to existing opencode server URL                              |
-| `--on-complete <command>` | Shell command to run after completion                          |
-| `--json`              | Output structured JSON result to stdout                             |
-| `--no-timestamp`      | Disable timestamp prefix in run output                              |
-| `--verbose`           | Show full event stream (default: messages/tools only)               |
-| `--session-id <id>`   | Resume existing session instead of creating new one                 |
+- `.research/derived/obsidian/manuscript.md`
+- `.research/derived/obsidian/claims.md`
+- `.research/derived/obsidian/evidence.md`
+- `.research/derived/obsidian/references.md`
 
----
+After export, derived artifact metadata is appended to `.research/runs/run-1/metadata.json` and `.research/export/manifest.json`.
+The corresponding `workspace.json` run metadata is refreshed as well.
 
-## get-local-version
+## obsidian-open
 
-Show current installed version and check for updates.
+Creates an Obsidian URI for one of the exported notes.
 
-### Usage
+This command fails if the requested note has not been exported yet.
 
 ```bash
-bunx oh-my-opencode get-local-version
+bun run src/cli/index.ts obsidian-open --vault ResearchVault --note claims --directory /tmp/research-fixture
 ```
 
-### Options
+Expected result:
 
-| Option            | Description                                    |
-| ----------------- | ---------------------------------------------- |
-| `-d, --directory` | Working directory to check config from         |
-| `--json`          | Output in JSON format for scripting            |
+- prints an `obsidian://open?...` URI after the note exists
+- exits with an error if the requested note has not been exported yet
 
-### Output
+## kg-build
 
-Shows:
-- Current installed version
-- Latest available version on npm
-- Whether you're up to date
-- Special modes (local dev, pinned version)
+Builds a local derived knowledge graph from a workspace JSON file.
 
----
+The simplest input path is the `workspace.json` emitted by `fixture-run`.
+
+```bash
+bun run src/cli/index.ts kg-build --workspace /tmp/research-fixture/workspace.json --directory /tmp/research-fixture
+```
+
+Expected output:
+
+- `.research/derived/knowledge-graph/graph.json`
+
+After build, the graph artifact is appended to `.research/runs/run-1/metadata.json` and `.research/export/manifest.json`.
+The corresponding `workspace.json` run metadata is refreshed as well.
+
+## kg-query
+
+Queries the local derived knowledge graph for matching nodes and connected edges.
+
+```bash
+bun run src/cli/index.ts kg-query --directory /tmp/research-fixture --query claim
+```
+
+Expected result:
+
+- prints matching node/edge JSON from `.research/derived/knowledge-graph/graph.json`
+- exits with an error if the knowledge graph has not been built yet
 
 ## version
 
-Show version information.
-
-### Usage
+Shows the current CLI version.
 
 ```bash
-bunx oh-my-opencode version
-```
-
-`--on-complete` runs through your current shell when possible: `sh` on Unix shells, `pwsh` for PowerShell on non-Windows, `powershell.exe` for PowerShell on Windows, and `cmd.exe` as the Windows fallback.
-
----
-
-## mcp oauth
-
-Manages OAuth 2.1 authentication for remote MCP servers.
-
-### Usage
-
-```bash
-# Login to an OAuth-protected MCP server
-bunx oh-my-opencode mcp oauth login <server-name> --server-url https://api.example.com
-
-# Login with explicit client ID and scopes
-bunx oh-my-opencode mcp oauth login my-api --server-url https://api.example.com --client-id my-client --scopes read write
-
-# Remove stored OAuth tokens
-bunx oh-my-opencode mcp oauth logout <server-name> --server-url https://api.example.com
-
-# Check OAuth token status
-bunx oh-my-opencode mcp oauth status [server-name]
-```
-
-### Options
-
-| Option               | Description                                                               |
-| -------------------- | ------------------------------------------------------------------------- |
-| `--server-url <url>` | MCP server URL (required for login)                                       |
-| `--client-id <id>`   | OAuth client ID (optional if server supports Dynamic Client Registration) |
-| `--scopes <scopes>`  | OAuth scopes as separate variadic arguments (for example: `--scopes read write`) |
-
-### Token Storage
-
-Tokens are stored in `~/.config/opencode/mcp-oauth.json` with `0600` permissions (owner read/write only). Key format: `{serverHost}/{resource}`.
-
----
-
-## Configuration Files
-
-The runtime loads user config as the base config, then merges project config on top:
-
-1. **Project Level**: `.opencode/oh-my-openagent.jsonc`, `.opencode/oh-my-openagent.json`, `.opencode/oh-my-opencode.jsonc`, or `.opencode/oh-my-opencode.json`
-2. **User Level**: `~/.config/opencode/oh-my-openagent.jsonc`, `~/.config/opencode/oh-my-openagent.json`, `~/.config/opencode/oh-my-opencode.jsonc`, or `~/.config/opencode/oh-my-opencode.json`
-
-**Naming Note**: The published package and binary are still `oh-my-opencode`. Inside `opencode.json`, the compatibility layer now prefers the plugin entry `oh-my-openagent`. Plugin config loading recognizes both `oh-my-openagent.*` and legacy `oh-my-opencode.*` basenames. If both basenames exist in the same directory, the legacy `oh-my-opencode.*` file currently wins.
-
-### Filename Compatibility
-
-Both `.jsonc` and `.json` extensions are supported. JSONC (JSON with Comments) is preferred as it allows:
-- Comments (both `//` and `/* */` styles)
-- Trailing commas in arrays and objects
-
-If both `.jsonc` and `.json` exist in the same directory, the `.jsonc` file takes precedence.
-
-### JSONC Support
-
-Configuration files support **JSONC (JSON with Comments)** format. You can use comments and trailing commas.
-
-```jsonc
-{
-  // Agent configuration
-  "sisyphus_agent": {
-    "disabled": false,
-    "planner_enabled": true,
-  },
-
-  /* Category customization */
-  "categories": {
-    "visual-engineering": {
-      "model": "google/gemini-3.1-pro",
-    },
-  },
-}
-```
-
----
-
-## Troubleshooting
-
-### "OpenCode version too old" Error
-
-```bash
-# Update OpenCode
-npm install -g opencode@latest
-# or
-bun install -g opencode@latest
-```
-
-### "Plugin not registered" Error
-
-```bash
-# Reinstall plugin
-bunx oh-my-opencode install
-```
-
-### Doctor Check Failures
-
-```bash
-# Diagnose with detailed information
-bunx oh-my-opencode doctor --verbose
-
-# Show compact system dashboard
-bunx oh-my-opencode doctor --status
-
-# JSON output for scripting
-bunx oh-my-opencode doctor --json
-```
-
-### "Using legacy package name" Warning
-
-The doctor warns if it finds the legacy plugin entry `oh-my-opencode` in `opencode.json`. Update the plugin array to the canonical `oh-my-openagent` entry:
-
-```bash
-# Replace the legacy plugin entry in user config
-jq '.plugin = (.plugin // [] | map(if . == "oh-my-opencode" then "oh-my-openagent" else . end))' \
-  ~/.config/opencode/opencode.json > /tmp/opencode.json && mv /tmp/opencode.json ~/.config/opencode/opencode.json
-```
----
-
-## refresh-model-capabilities
-
-Refreshes the cached model capabilities snapshot from models.dev. This updates the local cache used by capability resolution and compatibility diagnostics.
-
-### Usage
-
-```bash
-bunx oh-my-opencode refresh-model-capabilities
-```
-
-### Options
-
-| Option            | Description                                         |
-| ----------------- | --------------------------------------------------- |
-| `-d, --directory` | Working directory to read oh-my-opencode config from |
-| `--source-url <url>` | Override the models.dev source URL               |
-| `--json`          | Output refresh summary as JSON                      |
-
-### Configuration
-
-Configure automatic refresh behavior in your plugin config:
-
-```jsonc
-{
-  "model_capabilities": {
-    "enabled": true,
-    "auto_refresh_on_start": true,
-    "refresh_timeout_ms": 5000,
-    "source_url": "https://models.dev/api.json"
-  }
-}
-```
-
----
-
-## Non-Interactive Mode
-
-Use JSON output for CI or scripted diagnostics.
-
-```bash
-# Run doctor in CI environment
-bunx oh-my-opencode doctor --json
-
-# Save results to file
-bunx oh-my-opencode doctor --json > doctor-report.json
-```
-
----
-
-## Developer Information
-
-### CLI Structure
-
-```
-src/cli/
-├── cli-program.ts        # Commander.js-based main entry
-├── install.ts            # @clack/prompts-based TUI installer
-├── config-manager/       # JSONC parsing, multi-source config management
-│   └── *.ts
-├── doctor/               # Health check system
-│   ├── index.ts          # Doctor command entry
-│   └── checks/           # 17+ individual check modules
-├── run/                  # Session runner
-│   └── *.ts
-└── mcp-oauth/            # OAuth management commands
-    └── *.ts
-```
-
-### Adding New Doctor Checks
-
-Create `src/cli/doctor/checks/my-check.ts`:
-
-```typescript
-import type { DoctorCheck } from "../types";
-
-export const myCheck: DoctorCheck = {
-  name: "my-check",
-  category: "environment",
-  check: async () => {
-    // Check logic
-    const isOk = await someValidation();
-
-    return {
-      status: isOk ? "pass" : "fail",
-      message: isOk ? "Everything looks good" : "Something is wrong",
-    };
-  },
-};
-```
-
-Register in `src/cli/doctor/checks/index.ts`:
-
-```typescript
-export { myCheck } from "./my-check";
+bun run src/cli/index.ts version
 ```

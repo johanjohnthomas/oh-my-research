@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs"
 
 const workflowPaths = [
   new URL("../.github/workflows/ci.yml", import.meta.url),
-  new URL("../.github/workflows/publish.yml", import.meta.url),
 ]
 
 describe("test workflows", () => {

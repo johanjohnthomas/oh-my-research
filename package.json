@@ -1,58 +1,51 @@
 {
-  "name": "oh-my-opencode",
+  "name": "oh-my-research",
   "version": "3.16.0",
-  "description": "The Best AI Agent Harness - Batteries-Included OpenCode Plugin with Multi-Model Orchestration, Parallel Background Agents, and Crafted LSP/AST Tools",
-  "main": "./dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "Local-first research workflow system for evidence-backed LaTeX paper iteration",
+  "main": "./dist/research-runtime.js",
+  "types": "dist/research-runtime.d.ts",
   "type": "module",
   "bin": {
-    "oh-my-opencode": "bin/oh-my-opencode.js"
+    "oh-my-research": "dist/cli/index.js"
   },
   "files": [
-    "dist",
-    "bin",
-    "postinstall.mjs"
+    "dist/research-runtime.js",
+    "dist/research-runtime.d.ts",
+    "dist/cli/index.js",
+    "dist/config",
+    "dist/shared/config-errors.d.ts",
+    "dist/oh-my-research.schema.json"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/research-runtime.d.ts",
+      "import": "./dist/research-runtime.js"
     },
-    "./schema.json": "./dist/oh-my-opencode.schema.json"
+    "./schema.json": "./dist/oh-my-research.schema.json"
   },
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi && tsc --emitDeclarationOnly && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi && bun run build:schema",
-    "build:all": "bun run build && bun run build:binaries",
-    "build:binaries": "bun run script/build-binaries.ts",
+    "build": "rm -rf dist && bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi && bun build src/research-runtime.ts --outdir dist --target bun --format esm --external @ast-grep/napi && tsc --emitDeclarationOnly && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi && bun run build:schema",
     "build:schema": "bun run script/build-schema.ts",
     "build:model-capabilities": "bun run script/build-model-capabilities.ts",
     "clean": "rm -rf dist",
     "prepare": "bun run build",
-    "postinstall": "node postinstall.mjs",
-    "prepublishOnly": "bun run clean && bun run build",
+    "verify:product": "bun run script/verify-product.ts",
+    "test:tmux": "bun test src/shared/tmux/tmux-utils.test.ts src/shared/tmux/tmux-utils/layout.test.ts",
+    "test:core": "bun test $(git ls-files '*.test.ts' '*.spec.ts' ':!:src/shared/tmux/tmux-utils.test.ts' ':!:src/shared/tmux/tmux-utils/layout.test.ts')",
     "test:model-capabilities": "bun test src/shared/model-capability-aliases.test.ts src/shared/model-capability-guardrails.test.ts src/shared/model-capabilities.test.ts src/cli/doctor/checks/model-resolution.test.ts --bail",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun run test:core && bun run test:tmux"
   },
   "keywords": [
-    "opencode",
-    "plugin",
-    "oracle",
-    "librarian",
-    "agents",
-    "ai",
-    "llm"
+    "research",
+    "latex",
+    "zotero",
+    "bibliography",
+    "knowledge-graph",
+    "agents"
   ],
-  "author": "YeonGyu-Kim",
+  "author": "Oh My Research contributors",
   "license": "SUL-1.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/code-yeongyu/oh-my-openagent.git"
-  },
-  "bugs": {
-    "url": "https://github.com/code-yeongyu/oh-my-openagent/issues"
-  },
-  "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
     "@ast-grep/cli": "^0.41.1",
     "@ast-grep/napi": "^0.41.1",
@@ -76,19 +69,6 @@
     "@types/picomatch": "^3.0.2",
     "bun-types": "1.3.11",
     "typescript": "^5.7.3"
-  },
-  "optionalDependencies": {
-    "oh-my-opencode-darwin-arm64": "3.16.0",
-    "oh-my-opencode-darwin-x64": "3.16.0",
-    "oh-my-opencode-darwin-x64-baseline": "3.16.0",
-    "oh-my-opencode-linux-arm64": "3.16.0",
-    "oh-my-opencode-linux-arm64-musl": "3.16.0",
-    "oh-my-opencode-linux-x64": "3.16.0",
-    "oh-my-opencode-linux-x64-baseline": "3.16.0",
-    "oh-my-opencode-linux-x64-musl": "3.16.0",
-    "oh-my-opencode-linux-x64-musl-baseline": "3.16.0",
-    "oh-my-opencode-windows-x64": "3.16.0",
-    "oh-my-opencode-windows-x64-baseline": "3.16.0"
   },
   "overrides": {},
   "trustedDependencies": [

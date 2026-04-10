@@ -1,12 +1,12 @@
 name: Bug Report
-description: Report a bug or unexpected behavior in oh-my-opencode
+description: Report a bug or unexpected behavior in oh-my-research
 title: "[Bug]: "
 labels: ["bug", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        **Please write your issue in English.** See our [Language Policy](https://github.com/code-yeongyu/oh-my-opencode/blob/dev/CONTRIBUTING.md#language-policy) for details.
+        **Please write your issue in English.** See our [Language Policy](../CONTRIBUTING.md) for details.
 
   - type: checkboxes
     id: prerequisites
@@ -14,13 +14,13 @@ body:
       label: Prerequisites
       description: Please confirm the following before submitting
       options:
-        - label: I will write this issue in English (see our [Language Policy](https://github.com/code-yeongyu/oh-my-opencode/blob/dev/CONTRIBUTING.md#language-policy))
+        - label: I will write this issue in English (see our [Language Policy](../CONTRIBUTING.md))
           required: true
         - label: I have searched existing issues to avoid duplicates
           required: true
-        - label: I am using the latest version of oh-my-opencode
+        - label: I am using the latest version of oh-my-research
           required: true
-        - label: I have read the [documentation](https://github.com/code-yeongyu/oh-my-opencode#readme) or asked an AI coding agent with this project's GitHub URL loaded and couldn't find the answer
+        - label: I have read the [documentation](../docs/reference/cli.md) or asked an AI coding agent with this project's GitHub URL loaded and couldn't find the answer
           required: true
 
   - type: textarea
@@ -38,7 +38,7 @@ body:
       label: Steps to Reproduce
       description: Steps to reproduce the behavior
       placeholder: |
-        1. Configure oh-my-opencode with...
+        1. Configure oh-my-research with...
         2. Run command '...'
         3. See error...
     validations:
@@ -67,15 +67,14 @@ body:
     attributes:
       label: Doctor Output
       description: |
-        **Required:** Run `bunx oh-my-opencode doctor` and paste the full output below.
-        This helps us diagnose your environment and configuration.
+        If relevant, include the output from the current documented verification path and any failing command output.
       placeholder: |
-        Paste the output of: bunx oh-my-opencode doctor
+        Paste the relevant output of: bun run typecheck / bun test / bun run build / bun run verify:product
         
         Example:
-        ✓ OpenCode version: 1.0.150
-        ✓ oh-my-opencode version: 1.2.3
-        ✓ Plugin loaded successfully
+        ✓ oh-my-research version: 1.2.3
+        ✓ workspace-run completed
+        ✓ verify:product completed
         ...
       render: shell
     validations:
@@ -93,7 +92,7 @@ body:
     id: config
     attributes:
       label: Configuration
-      description: If relevant, share your oh-my-opencode configuration (remove sensitive data)
+      description: If relevant, share your oh-my-research configuration or workspace bundle details (remove sensitive data)
       placeholder: |
         {
           "agents": { ... },
@@ -124,8 +123,8 @@ body:
   - type: input
     id: opencode-version
     attributes:
-      label: OpenCode Version
-      description: Run `opencode --version` to get your version
-      placeholder: "1.0.150"
+      label: Runtime / CLI Version
+      description: Provide the relevant `oh-my-research` or host runtime version if applicable
+      placeholder: "oh-my-research 3.16.0"
     validations:
       required: true
