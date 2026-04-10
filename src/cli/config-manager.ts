@@ -3,6 +3,7 @@ export {
   initConfigContext,
   getConfigContext,
   resetConfigContext,
+  getOmoConfigPath,
 } from "./config-manager/config-context"
 
 export { fetchNpmDistTags } from "./config-manager/npm-dist-tags"
