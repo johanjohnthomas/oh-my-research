@@ -26,6 +26,7 @@ import { collectPendingBuiltinAgents } from "./builtin-agents/general-agents"
 import { maybeCreateSisyphusConfig } from "./builtin-agents/sisyphus-agent"
 import { maybeCreateHephaestusConfig } from "./builtin-agents/hephaestus-agent"
 import { maybeCreateAtlasConfig } from "./builtin-agents/atlas-agent"
+import { addResearchAgentAliases, normalizeResearchAgentAliases } from "./research-runtime-aliases"
 
 type AgentSource = AgentFactory | AgentConfig
 
@@ -73,6 +74,12 @@ export async function createBuiltinAgents(
   useTaskSystem = false,
   disableOmoEnv = false
 ): Promise<Record<string, AgentConfig>> {
+  const normalizedAgentConfig = normalizeResearchAgentAliases({
+    disabledAgents,
+    agentOverrides,
+  })
+  disabledAgents = normalizedAgentConfig.disabledAgents
+  agentOverrides = normalizedAgentConfig.agentOverrides
 
   const connectedProviders = readConnectedProvidersCache()
   const providerModelsConnected = connectedProviders
@@ -177,6 +184,11 @@ export async function createBuiltinAgents(
   if (atlasConfig) {
     result["atlas"] = atlasConfig
   }
+
+  addResearchAgentAliases({
+    result,
+    availableAgents,
+  })
 
   return result
 }

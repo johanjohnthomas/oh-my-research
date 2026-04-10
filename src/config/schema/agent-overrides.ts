@@ -72,6 +72,16 @@ export const AgentOverridesSchema = z.object({
   explore: AgentOverrideConfigSchema.optional(),
   "multimodal-looker": AgentOverrideConfigSchema.optional(),
   atlas: AgentOverrideConfigSchema.optional(),
+  research_ingest: AgentOverrideConfigSchema.optional(),
+  research_bibliography: AgentOverrideConfigSchema.optional(),
+  research_extract: AgentOverrideConfigSchema.optional(),
+  research_synthesize: AgentOverrideConfigSchema.optional(),
+  research_draft: AgentOverrideConfigSchema.optional(),
+  research_verification: AgentOverrideConfigSchema.optional(),
+  research_review: AgentOverrideConfigSchema.optional(),
+  research_export: AgentOverrideConfigSchema.optional(),
+  research_obsidian: AgentOverrideConfigSchema.optional(),
+  research_knowledge_graph: AgentOverrideConfigSchema.optional(),
 })
 
 export type AgentOverrideConfig = z.infer<typeof AgentOverrideConfigSchema>

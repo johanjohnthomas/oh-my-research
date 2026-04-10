@@ -10,7 +10,7 @@ import {
   ExperimentalConfigSchema,
   GitMasterConfigSchema,
   HookNameSchema,
-  OhMyOpenCodeConfigSchema,
+  OhMyResearchConfigSchema,
 } from "./schema"
 
 describe("disabled_mcps schema", () => {
@@ -21,7 +21,7 @@ describe("disabled_mcps schema", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -37,7 +37,7 @@ describe("disabled_mcps schema", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -53,7 +53,7 @@ describe("disabled_mcps schema", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -69,7 +69,7 @@ describe("disabled_mcps schema", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -85,7 +85,7 @@ describe("disabled_mcps schema", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(false)
@@ -96,7 +96,7 @@ describe("disabled_mcps schema", () => {
     const config = {}
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -112,7 +112,7 @@ describe("disabled_mcps schema", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(false)
@@ -131,7 +131,7 @@ describe("disabled_mcps schema", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -158,7 +158,7 @@ describe("OhMyOpenCodeConfigSchema - model_capabilities", () => {
       },
     }
 
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     expect(result.success).toBe(true)
     if (result.success) {
@@ -167,7 +167,7 @@ describe("OhMyOpenCodeConfigSchema - model_capabilities", () => {
   })
 
   test("rejects invalid model capabilities config", () => {
-    const result = OhMyOpenCodeConfigSchema.safeParse({
+    const result = OhMyResearchConfigSchema.safeParse({
       model_capabilities: {
         refresh_timeout_ms: -1,
         source_url: "not-a-url",
@@ -484,7 +484,7 @@ describe("Sisyphus-Junior agent override", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -506,7 +506,7 @@ describe("Sisyphus-Junior agent override", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -531,7 +531,7 @@ describe("Sisyphus-Junior agent override", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -560,7 +560,7 @@ describe("Sisyphus-Junior agent override", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -585,7 +585,7 @@ describe("Sisyphus-Junior agent override", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     // then
     expect(result.success).toBe(true)
@@ -690,7 +690,7 @@ describe("OhMyOpenCodeConfigSchema - browser_automation_engine", () => {
     }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     // then
     expect(result.success).toBe(true)
@@ -702,7 +702,7 @@ describe("OhMyOpenCodeConfigSchema - browser_automation_engine", () => {
     const input = {}
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     // then
     expect(result.success).toBe(true)
@@ -714,7 +714,7 @@ describe("OhMyOpenCodeConfigSchema - browser_automation_engine", () => {
     const input = { browser_automation_engine: { provider: "playwright-cli" } }
 
     // when
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     // then
     expect(result.success).toBe(true)
@@ -728,7 +728,7 @@ describe("OhMyOpenCodeConfigSchema - hashline_edit", () => {
     const input = { hashline_edit: true }
 
     //#when
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     //#then
     expect(result.success).toBe(true)
@@ -740,7 +740,7 @@ describe("OhMyOpenCodeConfigSchema - hashline_edit", () => {
     const input = { hashline_edit: false }
 
     //#when
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     //#then
     expect(result.success).toBe(true)
@@ -752,7 +752,7 @@ describe("OhMyOpenCodeConfigSchema - hashline_edit", () => {
     const input = { auto_update: true }
 
     //#when
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     //#then
     expect(result.success).toBe(true)
@@ -764,7 +764,7 @@ describe("OhMyOpenCodeConfigSchema - hashline_edit", () => {
     const input = { hashline_edit: "true" }
 
     //#when
-    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+    const result = OhMyResearchConfigSchema.safeParse(input)
 
     //#then
     expect(result.success).toBe(false)
@@ -975,7 +975,7 @@ describe("OhMyOpenCodeConfigSchema - git_master defaults (#2040)", () => {
     const config = {}
 
     //#when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     //#then
     expect(result.success).toBe(true)
@@ -997,7 +997,7 @@ describe("OhMyOpenCodeConfigSchema - git_master defaults (#2040)", () => {
     }
 
     //#when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     //#then
     expect(result.success).toBe(true)
@@ -1018,7 +1018,7 @@ describe("skills schema", () => {
     }
 
     //#when
-    const result = OhMyOpenCodeConfigSchema.safeParse(config)
+    const result = OhMyResearchConfigSchema.safeParse(config)
 
     //#then
     expect(result.success).toBe(true)

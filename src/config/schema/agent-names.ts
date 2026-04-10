@@ -12,6 +12,16 @@ export const BuiltinAgentNameSchema = z.enum([
   "momus",
   "atlas",
   "sisyphus-junior",
+  "research_ingest",
+  "research_bibliography",
+  "research_extract",
+  "research_synthesize",
+  "research_draft",
+  "research_verification",
+  "research_review",
+  "research_export",
+  "research_obsidian",
+  "research_knowledge_graph",
 ])
 
 export const BuiltinSkillNameSchema = z.enum([
@@ -22,6 +32,9 @@ export const BuiltinSkillNameSchema = z.enum([
   "git-master",
   "review-work",
   "ai-slop-remover",
+  "research_review",
+  "research_cleanup",
+  "research_browser_validation",
 ])
 
 export const OverridableAgentNameSchema = z.enum([
@@ -39,6 +52,16 @@ export const OverridableAgentNameSchema = z.enum([
   "explore",
   "multimodal-looker",
   "atlas",
+  "research_ingest",
+  "research_bibliography",
+  "research_extract",
+  "research_synthesize",
+  "research_draft",
+  "research_verification",
+  "research_review",
+  "research_export",
+  "research_obsidian",
+  "research_knowledge_graph",
 ])
 
 export const AgentNameSchema = BuiltinAgentNameSchema

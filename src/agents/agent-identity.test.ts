@@ -10,15 +10,15 @@ describe("buildAgentIdentitySection", () => {
   describe("#given an agent name and role description", () => {
     describe("#when building the identity section", () => {
       it("#then includes the agent name prominently", () => {
-        const result = buildAgentIdentitySection("Sisyphus", "Powerful AI orchestrator from OhMyOpenCode")
+    const result = buildAgentIdentitySection("Sisyphus", "Powerful AI orchestrator for Oh My Research")
 
         expect(result).toContain("Sisyphus")
       })
 
       it("#then includes the role description", () => {
-        const result = buildAgentIdentitySection("Sisyphus", "Powerful AI orchestrator from OhMyOpenCode")
+    const result = buildAgentIdentitySection("Sisyphus", "Powerful AI orchestrator for Oh My Research")
 
-        expect(result).toContain("Powerful AI orchestrator from OhMyOpenCode")
+    expect(result).toContain("Powerful AI orchestrator for Oh My Research")
       })
 
       it("#then wraps content in an identity XML tag", () => {
@@ -29,7 +29,7 @@ describe("buildAgentIdentitySection", () => {
       })
 
       it("#then explicitly states this identity overrides any prior identity", () => {
-        const result = buildAgentIdentitySection("Sisyphus", "Powerful AI orchestrator from OhMyOpenCode")
+    const result = buildAgentIdentitySection("Sisyphus", "Powerful AI orchestrator for Oh My Research")
 
         expect(result).toMatch(/override|supersede|replace|disregard|instead of/i)
       })
