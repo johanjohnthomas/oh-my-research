@@ -1,81 +1,146 @@
 import { Command } from "commander"
-import { install } from "./install"
 import { run } from "./run"
-import { getLocalVersion } from "./get-local-version"
-import { doctor } from "./doctor"
-import { refreshModelCapabilities } from "./refresh-model-capabilities"
-import { createMcpOAuthCommand } from "./mcp-oauth"
-import type { InstallArgs } from "./types"
 import type { RunOptions } from "./run"
-import type { GetLocalVersionOptions } from "./get-local-version/types"
-import type { DoctorOptions } from "./doctor"
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { runFixtureResearchWorkflow, runResearchWorkspaceWorkflow } from "../features/research-workflow"
+import { createFixtureResearchWorkspace, createStarterResearchWorkspace } from "../features/research-workflow/fixture-workspace"
+import { researchWorkspaceSchema } from "../features/research-artifacts"
+import { createObsidianOpenUri, exportWorkspaceToObsidian } from "../features/research-obsidian"
+import { buildKnowledgeGraph, queryKnowledgeGraph, readKnowledgeGraph, writeKnowledgeGraph } from "../features/research-knowledge-graph"
+import { syncZoteroBibliography, type ZoteroLibraryType } from "../features/research-bibliography"
+import { appendGeneratedArtifactsToRunMetadata, readRunMetadata } from "../features/research-reproducibility"
+import { getResearchRole } from "../features/research-workflow/roles"
 import packageJson from "../../package.json" with { type: "json" }
 
 const VERSION = packageJson.version
 
+interface RunCommandOptions {
+  agent?: string
+  model?: string
+  directory?: string
+  port?: number
+  attach?: string
+  onComplete?: string
+  json?: boolean
+  timestamp?: boolean
+  verbose?: boolean
+  sessionId?: string
+}
+
+interface DirectoryOption {
+  directory?: string
+}
+
+interface WorkspaceOption extends DirectoryOption {
+  workspace: string
+  resetState?: boolean
+}
+
+interface ZoteroSyncOption extends DirectoryOption {
+  libraryType: ZoteroLibraryType
+  libraryId: string
+  apiKey?: string
+  collectionKey?: string
+  limit?: number
+  workspace?: string
+}
+
+interface ObsidianOpenOption extends DirectoryOption {
+  vault: string
+  note: "manuscript" | "claims" | "evidence" | "references"
+}
+
+interface WorkspaceInitOption extends DirectoryOption {
+  title: string
+}
+
+interface KnowledgeGraphQueryOption extends DirectoryOption {
+  query: string
+}
+
+function loadWorkspaceFromFile(filePath: string) {
+  const parsed = JSON.parse(readFileSync(filePath, "utf-8"))
+  return researchWorkspaceSchema.parse(parsed)
+}
+
+function updateWorkspaceFile(
+  workspacePath: string,
+  updater: (workspace: ReturnType<typeof loadWorkspaceFromFile>) => Record<string, unknown>,
+): void {
+  if (!existsSync(workspacePath)) {
+    return
+  }
+
+  const workspace = loadWorkspaceFromFile(workspacePath)
+  writeFileSync(workspacePath, JSON.stringify(updater(workspace), null, 2), "utf-8")
+}
+
+function updateDerivedArtifactsMetadata(directory: string, filePaths: string[], workspacePath?: string): void {
+  const resolvedWorkspacePath = workspacePath ?? `${directory}/workspace.json`
+  const workspace = existsSync(resolvedWorkspacePath) ? loadWorkspaceFromFile(resolvedWorkspacePath) : null
+  const runId = workspace?.runs.at(-1)?.runId ?? readRunMetadata(directory, "run-1")?.runId ?? "run-1"
+  const updatedMetadata = appendGeneratedArtifactsToRunMetadata({
+    directory,
+    runId,
+    filePaths,
+  })
+
+  const manifestPath = `${directory}/.research/export/manifest.json`
+  try {
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf-8")) as Record<string, unknown>
+    const nextManifest = {
+      ...manifest,
+      derivedArtifacts: Array.from(new Set([...(manifest.derivedArtifacts as string[] | undefined ?? []), ...filePaths.map((filePath) => filePath.replace(`${directory}/`, "./"))])),
+    }
+    writeFileSync(manifestPath, JSON.stringify(nextManifest, null, 2), "utf-8")
+  } catch {
+  }
+
+  if (!workspace || !updatedMetadata) {
+    return
+  }
+
+  writeFileSync(
+    resolvedWorkspacePath,
+    JSON.stringify(
+      {
+        ...workspace,
+        runs: workspace.runs.some((run) => run.runId === updatedMetadata.runId)
+          ? workspace.runs.map((run) => (run.runId === updatedMetadata.runId ? updatedMetadata : run))
+          : [...workspace.runs, updatedMetadata],
+      },
+      null,
+      2,
+    ),
+    "utf-8",
+  )
+}
+
+function writeDerivedRoleArtifact(directory: string, roleName: "obsidian" | "knowledge-graph"): string {
+  mkdirSync(`${directory}/.research/workflow`, { recursive: true })
+  const outputPath = `${directory}/.research/workflow/${roleName}-role.json`
+  writeFileSync(outputPath, JSON.stringify(getResearchRole(roleName), null, 2), "utf-8")
+  return outputPath
+}
+
 const program = new Command()
 
 program
-  .name("oh-my-opencode")
-  .description("The ultimate OpenCode plugin - multi-model orchestration, LSP tools, and more")
+  .name("oh-my-research")
+  .description("Local-first research workflow runner for evidence-backed LaTeX paper development")
   .version(VERSION, "-v, --version", "Show version number")
   .enablePositionalOptions()
 
 program
-  .command("install")
-  .description("Install and configure oh-my-opencode with interactive setup")
-  .option("--no-tui", "Run in non-interactive mode (requires all options)")
-  .option("--claude <value>", "Claude subscription: no, yes, max20")
-  .option("--openai <value>", "OpenAI/ChatGPT subscription: no, yes (default: no)")
-  .option("--gemini <value>", "Gemini integration: no, yes")
-  .option("--copilot <value>", "GitHub Copilot subscription: no, yes")
-  .option("--opencode-zen <value>", "OpenCode Zen access: no, yes (default: no)")
-  .option("--zai-coding-plan <value>", "Z.ai Coding Plan subscription: no, yes (default: no)")
-  .option("--kimi-for-coding <value>", "Kimi For Coding subscription: no, yes (default: no)")
-  .option("--opencode-go <value>", "OpenCode Go subscription: no, yes (default: no)")
-  .option("--skip-auth", "Skip authentication setup hints")
-  .addHelpText("after", `
-Examples:
-  $ bunx oh-my-opencode install
-  $ bunx oh-my-opencode install --no-tui --claude=max20 --openai=yes --gemini=yes --copilot=no
-  $ bunx oh-my-opencode install --no-tui --claude=no --gemini=no --copilot=yes --opencode-zen=yes
-
-Model Providers (Priority: Native > Copilot > OpenCode Zen > Z.ai > Kimi):
-  Claude        Native anthropic/ models (Opus, Sonnet, Haiku)
-  OpenAI        Native openai/ models (GPT-5.4 for Oracle)
-  Gemini        Native google/ models (Gemini 3.1 Pro, Flash)
-  Copilot       github-copilot/ models (fallback)
-  OpenCode Zen  opencode/ models (opencode/claude-opus-4-6, etc.)
-   Z.ai          zai-coding-plan/glm-5 (visual-engineering fallback)
-  Kimi          kimi-for-coding/k2p5 (Sisyphus/Prometheus fallback)
-`)
-  .action(async (options) => {
-    const args: InstallArgs = {
-      tui: options.tui !== false,
-      claude: options.claude,
-      openai: options.openai,
-      gemini: options.gemini,
-      copilot: options.copilot,
-      opencodeZen: options.opencodeZen,
-      zaiCodingPlan: options.zaiCodingPlan,
-      kimiForCoding: options.kimiForCoding,
-      opencodeGo: options.opencodeGo,
-      skipAuth: options.skipAuth ?? false,
-    }
-    const exitCode = await install(args)
-    process.exit(exitCode)
-  })
-
-program
-   .command("run <message>")
-   .allowUnknownOption()
-   .passThroughOptions()
-  .description("Run opencode with todo/background task completion enforcement")
-  .option("-a, --agent <name>", "Agent to use (default: from CLI/env/config, fallback: Sisyphus)")
+  .command("run <message>")
+  .allowUnknownOption()
+  .passThroughOptions()
+  .description("Transitional host/runtime session entrypoint during the remake")
+  .option("-a, --agent <name>", "Agent to use for the research session")
   .option("-m, --model <provider/model>", "Model override (e.g., anthropic/claude-sonnet-4)")
   .option("-d, --directory <path>", "Working directory")
-  .option("-p, --port <port>", "Server port (attaches if port already in use)", parseInt)
-  .option("--attach <url>", "Attach to existing opencode server URL")
+  .option("-p, --port <port>", "Server port (attaches if port already in use)", Number.parseInt)
+  .option("--attach <url>", "Attach to an existing session server URL")
   .option("--on-complete <command>", "Shell command to run after completion")
   .option("--json", "Output structured JSON result to stdout")
   .option("--no-timestamp", "Disable timestamp prefix in run output")
@@ -83,30 +148,10 @@ program
   .option("--session-id <id>", "Resume existing session instead of creating new one")
   .addHelpText("after", `
 Examples:
-  $ bunx oh-my-opencode run "Fix the bug in index.ts"
-  $ bunx oh-my-opencode run --agent Sisyphus "Implement feature X"
-  $ bunx oh-my-opencode run --port 4321 "Fix the bug"
-  $ bunx oh-my-opencode run --attach http://127.0.0.1:4321 "Fix the bug"
-  $ bunx oh-my-opencode run --json "Fix the bug" | jq .sessionId
-  $ bunx oh-my-opencode run --on-complete "notify-send Done" "Fix the bug"
-  $ bunx oh-my-opencode run --session-id ses_abc123 "Continue the work"
-  $ bunx oh-my-opencode run --model anthropic/claude-sonnet-4 "Fix the bug"
-  $ bunx oh-my-opencode run --agent Sisyphus --model openai/gpt-5.4 "Implement feature X"
-
-Agent resolution order:
-  1) --agent flag
-  2) OPENCODE_DEFAULT_AGENT
-  3) oh-my-opencode.json "default_run_agent"
-  4) Sisyphus (fallback)
-
-Available core agents:
-  Sisyphus, Hephaestus, Prometheus, Atlas
-
-Unlike 'opencode run', this command waits until:
-  - All todos are completed or cancelled
-  - All child sessions (background tasks) are idle
+  $ bun run src/cli/index.ts run "Draft the introduction section"
+  $ bun run src/cli/index.ts run --session-id ses_abc123 "Continue the paper workflow"
 `)
-  .action(async (message: string, options) => {
+  .action(async (message: string, options: RunCommandOptions) => {
     if (options.port && options.attach) {
       console.error("Error: --port and --attach are mutually exclusive")
       process.exit(1)
@@ -129,77 +174,154 @@ Unlike 'opencode run', this command waits until:
   })
 
 program
-  .command("get-local-version")
-  .description("Show current installed version and check for updates")
-  .option("-d, --directory <path>", "Working directory to check config from")
-  .option("--json", "Output in JSON format for scripting")
-  .addHelpText("after", `
-Examples:
-  $ bunx oh-my-opencode get-local-version
-  $ bunx oh-my-opencode get-local-version --json
-  $ bunx oh-my-opencode get-local-version --directory /path/to/project
-
-This command shows:
-  - Current installed version
-  - Latest available version on npm
-  - Whether you're up to date
-  - Special modes (local dev, pinned version)
-`)
-  .action(async (options) => {
-    const versionOptions: GetLocalVersionOptions = {
-      directory: options.directory,
-      json: options.json ?? false,
-    }
-    const exitCode = await getLocalVersion(versionOptions)
-    process.exit(exitCode)
-  })
-
-program
-  .command("doctor")
-  .description("Check oh-my-opencode installation health and diagnose issues")
-  .option("--status", "Show compact system dashboard")
-  .option("--verbose", "Show detailed diagnostic information")
-  .option("--json", "Output results in JSON format")
-  .addHelpText("after", `
-Examples:
-  $ bunx oh-my-opencode doctor            # Show problems only
-  $ bunx oh-my-opencode doctor --status   # Compact dashboard
-  $ bunx oh-my-opencode doctor --verbose  # Deep diagnostics
-  $ bunx oh-my-opencode doctor --json     # JSON output
-`)
-  .action(async (options) => {
-    const mode = options.status ? "status" : options.verbose ? "verbose" : "default"
-    const doctorOptions: DoctorOptions = {
-      mode,
-      json: options.json ?? false,
-    }
-    const exitCode = await doctor(doctorOptions)
-    process.exit(exitCode)
-  })
-
-program
-  .command("refresh-model-capabilities")
-  .description("Refresh the cached models.dev-based model capabilities snapshot")
-  .option("-d, --directory <path>", "Working directory to read oh-my-opencode config from")
-  .option("--source-url <url>", "Override the models.dev source URL")
-  .option("--json", "Output refresh summary as JSON")
-  .action(async (options) => {
-    const exitCode = await refreshModelCapabilities({
-      directory: options.directory,
-      sourceUrl: options.sourceUrl,
-      json: options.json ?? false,
-    })
-    process.exit(exitCode)
-  })
-
-program
   .command("version")
   .description("Show version information")
   .action(() => {
-    console.log(`oh-my-opencode v${VERSION}`)
+    console.log(`oh-my-research v${VERSION}`)
   })
 
-program.addCommand(createMcpOAuthCommand())
+program
+  .command("fixture-run")
+  .description("Run the built-in local research-paper fixture workflow and emit workspace.json")
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action(async (options: DirectoryOption) => {
+    const workspace = createFixtureResearchWorkspace()
+    await runFixtureResearchWorkflow({
+      directory: options.directory ?? process.cwd(),
+      workspace,
+    })
+    console.log("Fixture workflow completed")
+  })
+
+program
+  .command("workspace-init")
+  .description("Create a starter workspace.json for a new paper")
+  .requiredOption("--title <title>", "Paper title")
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action((options: WorkspaceInitOption) => {
+    mkdirSync(options.directory ?? process.cwd(), { recursive: true })
+    const workspace = createStarterResearchWorkspace({
+      title: options.title,
+    })
+    writeFileSync(
+      `${options.directory ?? process.cwd()}/workspace.json`,
+      JSON.stringify(workspace, null, 2),
+      "utf-8",
+    )
+    console.log("workspace.json created")
+  })
+
+program
+  .command("workspace-run")
+  .description("Run or resume the research workflow for a supplied workspace JSON file")
+  .requiredOption("-w, --workspace <path>", "Workspace JSON file")
+  .option("--reset-state", "Restart the workflow from ingest instead of resuming from saved state")
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action(async (options: WorkspaceOption) => {
+    await runResearchWorkspaceWorkflow({
+      directory: options.directory ?? process.cwd(),
+      workspace: loadWorkspaceFromFile(options.workspace),
+      resetState: options.resetState ?? false,
+    })
+    console.log("Workspace workflow completed")
+  })
+
+program
+  .command("zotero-sync")
+  .description("Sync references from Zotero and emit canonical bibliography artifacts")
+  .requiredOption("--library-type <users|groups>", "Zotero library type")
+  .requiredOption("--library-id <id>", "Zotero library identifier")
+  .option("-w, --workspace <path>", "Optional workspace JSON file to refresh after sync")
+  .option("--api-key <key>", "Zotero API key")
+  .option("--collection-key <key>", "Optional Zotero collection key")
+  .option("--limit <count>", "Maximum items to fetch", Number.parseInt)
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action(async (options: ZoteroSyncOption) => {
+    const directory = options.directory ?? process.cwd()
+    const bibliography = await syncZoteroBibliography({
+      directory,
+      params: {
+        libraryType: options.libraryType,
+        libraryId: options.libraryId,
+        apiKey: options.apiKey,
+        collectionKey: options.collectionKey,
+        limit: options.limit,
+      },
+    })
+    updateWorkspaceFile(options.workspace ?? `${directory}/workspace.json`, (workspace) => ({
+      ...workspace,
+      bibliography,
+    }))
+    console.log(bibliography.bibPath)
+  })
+
+program
+  .command("obsidian-export")
+  .description("Export a workspace JSON file to local Obsidian markdown artifacts")
+  .requiredOption("-w, --workspace <path>", "Workspace JSON file")
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action((options: WorkspaceOption) => {
+    const result = exportWorkspaceToObsidian({
+      directory: options.directory ?? process.cwd(),
+      workspace: loadWorkspaceFromFile(options.workspace),
+    })
+    const rolePath = writeDerivedRoleArtifact(options.directory ?? process.cwd(), "obsidian")
+    updateDerivedArtifactsMetadata(options.directory ?? process.cwd(), [...result.files, rolePath], options.workspace)
+    console.log(result.vaultPath)
+  })
+
+program
+  .command("obsidian-open")
+  .description("Create an Obsidian open URI for one of the generated research notes")
+  .requiredOption("--vault <name>", "Obsidian vault name")
+  .requiredOption("--note <manuscript|claims|evidence|references>", "Generated note to open")
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action((options: ObsidianOpenOption) => {
+    const notePath = `.research/derived/obsidian/${options.note}.md`
+    const absoluteNotePath = `${options.directory ?? process.cwd()}/${notePath}`
+    if (!existsSync(absoluteNotePath)) {
+      console.error(`Error: note does not exist yet at ${notePath}`)
+      process.exit(1)
+    }
+    console.log(createObsidianOpenUri(options.vault, notePath))
+  })
+
+program
+  .command("kg-build")
+  .description("Build a local derived knowledge graph from a workspace JSON file")
+  .requiredOption("-w, --workspace <path>", "Workspace JSON file")
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action((options: WorkspaceOption) => {
+    const workspace = loadWorkspaceFromFile(options.workspace)
+    const graph = buildKnowledgeGraph(workspace)
+    const outputPath = writeKnowledgeGraph({
+      directory: options.directory ?? process.cwd(),
+      graph,
+    })
+    const rolePath = writeDerivedRoleArtifact(options.directory ?? process.cwd(), "knowledge-graph")
+    updateDerivedArtifactsMetadata(options.directory ?? process.cwd(), [outputPath, rolePath], options.workspace)
+    console.log(outputPath)
+  })
+
+program
+  .command("kg-query")
+  .description("Query the local derived knowledge graph for matching nodes and edges")
+  .requiredOption("--query <text>", "Query text")
+  .option("-d, --directory <path>", "Working directory", process.cwd())
+  .action((options: KnowledgeGraphQueryOption) => {
+    const graphPath = `${options.directory ?? process.cwd()}/.research/derived/knowledge-graph/graph.json`
+    if (!existsSync(graphPath)) {
+      console.error("Error: knowledge graph does not exist yet. Run kg-build first.")
+      process.exit(1)
+    }
+
+    const graph = readKnowledgeGraph(graphPath)
+    const result = queryKnowledgeGraph({
+      graph,
+      query: options.query,
+    })
+    console.log(JSON.stringify(result, null, 2))
+  })
 
 export function runCli(): void {
   program.parse()

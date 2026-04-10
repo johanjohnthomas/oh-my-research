@@ -21,10 +21,10 @@ describe("getPluginNameWithVersion", () => {
     ) as unknown as typeof fetch
 
     //#when
-    const result = await getPluginNameWithVersion("3.13.1")
+    const result = await getPluginNameWithVersion("3.13.1", "oh-my-research")
 
     //#then
-    expect(result).toBe("oh-my-openagent@latest")
+    expect(result).toBe("oh-my-research@latest")
   })
 
   test("preserves the canonical prerelease channel when fetch fails", async () => {
@@ -32,10 +32,10 @@ describe("getPluginNameWithVersion", () => {
     globalThis.fetch = mock(() => Promise.reject(new Error("Network error"))) as unknown as typeof fetch
 
     //#when
-    const result = await getPluginNameWithVersion("3.14.0-beta.1")
+    const result = await getPluginNameWithVersion("3.14.0-beta.1", "oh-my-research")
 
     //#then
-    expect(result).toBe("oh-my-openagent@beta")
+    expect(result).toBe("oh-my-research@beta")
   })
 
   test("returns the canonical bare package name for stable fallback", async () => {
@@ -48,9 +48,9 @@ describe("getPluginNameWithVersion", () => {
     ) as unknown as typeof fetch
 
     //#when
-    const result = await getPluginNameWithVersion("3.13.1")
+    const result = await getPluginNameWithVersion("3.13.1", "oh-my-research")
 
     //#then
-    expect(result).toBe("oh-my-openagent")
+    expect(result).toBe("oh-my-research")
   })
 })

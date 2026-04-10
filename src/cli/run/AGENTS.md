@@ -1,56 +1,31 @@
-# src/cli/run/ — Non-Interactive Session Launcher
+# src/cli/run/ — Transitional Runtime Session Path
 
-**Generated:** 2026-04-05
+## Current Reality
 
-## OVERVIEW
+This directory still powers the generic `run <message>` path, which remains available during the remake as a transitional host/runtime session entrypoint.
 
-37 files. Powers the `oh-my-opencode run <message>` command. Connects to OpenCode server, creates/resumes sessions, streams events, and polls for completion.
+## Important Boundary
 
-## EXECUTION FLOW
+This is **not** the primary single-paper operator surface for the research workflow. The main research-first commands live in `src/cli/cli-program.ts` and include:
 
-```
-runner.ts
-  1. opencode-binary-resolver.ts → Find OpenCode binary
-  2. server-connection.ts → Connect to OpenCode server (start if needed)
-  3. agent-resolver.ts → Flag → env → config → Sisyphus
-  4. session-resolver.ts → Create new or resume existing session
-  5. events.ts → Stream SSE events from session
-  6. event-handlers.ts → Process each event type
-  7. poll-for-completion.ts → Wait for todos + background tasks done
-  8. on-complete-hook.ts → Execute user-defined completion hook
-```
+- `workspace-init`
+- `workspace-run`
+- `fixture-run`
+- `zotero-sync`
+- `obsidian-export`
+- `obsidian-open`
+- `kg-build`
+- `kg-query`
 
-## KEY FILES
+## Why This Directory Still Exists
 
-| File | Purpose |
-|------|---------|
-| `runner.ts` | Main orchestration — connects, resolves, runs, completes |
-| `server-connection.ts` | Start OpenCode server process, create SDK client |
-| `agent-resolver.ts` | Resolve agent: `--agent` flag → `OPENCODE_AGENT` env → config → Sisyphus |
-| `session-resolver.ts` | Create new session or resume via `--attach` / `--session-id` |
-| `events.ts` | SSE event stream subscription |
-| `event-handlers.ts` | Route events to handlers (message, tool, error, idle) |
-| `event-stream-processor.ts` | Process event stream with filtering and buffering |
-| `poll-for-completion.ts` | Poll session until todos complete + no background tasks |
-| `completion.ts` | Determine if session is truly done |
-| `continuation-state.ts` | Persist state for `run` continuation across invocations |
-| `output-renderer.ts` | Format session output for terminal |
-| `json-output.ts` | JSON output mode (`--json` flag) |
-| `types.ts` | `RunOptions`, `RunResult`, `RunContext`, event payload types |
+The repo is mid-extraction from the original host/plugin harness. The generic `run` flow is still useful as a compatibility path, but it should be treated as transitional rather than as the canonical operator story for the remake.
 
-## AGENT RESOLUTION PRIORITY
+## Source of Truth
 
-```
-1. --agent CLI flag
-2. OPENCODE_AGENT environment variable
-3. default_run_agent config
-4. "sisyphus" (default)
-```
+For current operator behavior, prefer:
 
-## COMPLETION DETECTION
-
-Poll-based with two conditions:
-1. All todos marked completed (no pending/in_progress)
-2. No running background tasks
-
-`on-complete-hook.ts` executes optional user command on completion (e.g., `--on-complete "notify-send done"`).
+- `README.md`
+- `docs/reference/cli.md`
+- `docs/guide/installation.md`
+- `src/cli/cli-program.ts`
