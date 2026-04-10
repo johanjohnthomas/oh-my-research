@@ -60,6 +60,11 @@ describe("checkVersionCompatibility", () => {
 })
 
 describe("extractVersionFromPluginEntry", () => {
+  it("extracts version from scoped canonical package entry", () => {
+    const version = extractVersionFromPluginEntry("@johanjohnthomas/oh-my-research@3.15.0")
+    expect(version).toBe("3.15.0")
+  })
+
   it("extracts version from canonical plugin entry", () => {
     const version = extractVersionFromPluginEntry("oh-my-openagent@3.15.0")
     expect(version).toBe("3.15.0")
@@ -72,6 +77,11 @@ describe("extractVersionFromPluginEntry", () => {
 
   it("returns null for bare plugin entry", () => {
     const version = extractVersionFromPluginEntry("oh-my-openagent")
+    expect(version).toBeNull()
+  })
+
+  it("returns null for bare scoped package entry", () => {
+    const version = extractVersionFromPluginEntry("@johanjohnthomas/oh-my-research")
     expect(version).toBeNull()
   })
 
