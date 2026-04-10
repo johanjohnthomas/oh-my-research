@@ -8,7 +8,7 @@ import { createChatMessageHandler } from "./chat-message"
 import { createAutoSlashCommandHook } from "../hooks/auto-slash-command"
 import { createStartWorkHook } from "../hooks/start-work"
 import { readBoulderState } from "../features/boulder-state"
-import { _resetForTesting, setMainSession, subagentSessions, registerAgentName, updateSessionAgent, getSessionAgent } from "../features/claude-code-session-state"
+import { _resetForTesting, setMainSession, subagentSessions, registerAgentName, updateSessionAgent, getSessionAgent } from "../features/session-state"
 import { getAgentListDisplayName } from "../shared/agent-display-names"
 import { clearSessionModel, getSessionModel, setSessionModel } from "../shared/session-model-state"
 
@@ -166,7 +166,7 @@ describe("createChatMessageHandler - /ulw-loop raw slash fallback", () => {
     ])
   })
 
-  test("starts ultrawork loop when injected messages appear before the raw /ulw-loop command", async () => {
+  test("does not start ultrawork loop when injected text precedes a raw /ulw-loop command", async () => {
     // given
     const startLoopCalls: Array<{
       sessionID: string
@@ -197,18 +197,7 @@ describe("createChatMessageHandler - /ulw-loop raw slash fallback", () => {
     await handler(input, output)
 
     // then
-    expect(startLoopCalls).toEqual([
-      {
-        sessionID: "test-session",
-        prompt: "Ship feature",
-        options: {
-          ultrawork: true,
-          maxIterations: undefined,
-          completionPromise: undefined,
-          strategy: "continue",
-        },
-      },
-    ])
+    expect(startLoopCalls).toEqual([])
   })
 })
 
