@@ -36,7 +36,11 @@ bun run verify:product
 
 ## Runtime Requirement
 
-The published CLI requires Bun on your `PATH`. Install Bun first, then install `oh-my-research`.
+The published CLI requires Bun on your `PATH`. Install Bun first, then install `@johanjohnthomas/oh-my-research`.
+
+```bash
+npm install -g @johanjohnthomas/oh-my-research
+```
 
 ## Operator Commands
 
@@ -59,6 +63,8 @@ Key commands:
 - `oh-my-research kg-query --directory /tmp/research-fixture --query claim`
 
 `fixture-run` emits both `.research/` artifacts and a reusable `workspace.json` in the target directory. That workspace bundle is a reusable export of the canonical `.research/` state, not a replacement for the canonical artifact tree itself.
+
+If OpenCode is already installed on the machine, the first CLI run also bootstraps the matching OpenCode plugin entry and default `oh-my-research` config file automatically.
 
 `workspace-init` creates a starter workspace bundle for a new paper.
 

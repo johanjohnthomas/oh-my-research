@@ -11,7 +11,7 @@ bun --version
 Then install the package:
 
 ```bash
-npm install -g oh-my-research
+npm install -g @johanjohnthomas/oh-my-research
 ```
 
 Then verify the installed command:
@@ -19,6 +19,8 @@ Then verify the installed command:
 ```bash
 oh-my-research --help
 ```
+
+If OpenCode is already installed on the machine, the first CLI invocation automatically writes the matching OpenCode plugin entry and a default `oh-my-research` config file.
 
 ## Local Development Setup
 

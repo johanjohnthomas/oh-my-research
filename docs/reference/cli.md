@@ -2,6 +2,12 @@
 
 Reference for the installed `oh-my-research` CLI.
 
+Install package:
+
+```bash
+npm install -g @johanjohnthomas/oh-my-research
+```
+
 ## Basic Usage
 
 ```bash
@@ -13,6 +19,8 @@ For a full product smoke path, use:
 ```bash
 bun run verify:product
 ```
+
+If OpenCode is installed, the first CLI invocation bootstraps the matching OpenCode plugin/config entries automatically before command execution.
 
 ## Commands
 
