@@ -1,7 +1,7 @@
-import { PLUGIN_NAME } from "../../shared"
+import { PACKAGE_NAME } from "../../shared"
 import { fetchNpmDistTags } from "./npm-dist-tags"
 
-const DEFAULT_PACKAGE_NAME = PLUGIN_NAME
+const DEFAULT_PACKAGE_NAME = PACKAGE_NAME
 const PRIORITIZED_TAGS = ["latest", "beta", "next"] as const
 
 function getFallbackEntry(version: string, packageName: string): string {

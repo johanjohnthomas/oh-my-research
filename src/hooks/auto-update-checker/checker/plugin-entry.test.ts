@@ -17,6 +17,7 @@ function runFindPluginEntry(
   directory: string,
   envOverrides: Record<string, string | undefined> = {},
 ): { status: number | null; stdout: string; stderr: string } {
+  const defaultConfigDir = path.join(directory, ".opencode")
   const command = [
     `import { findPluginEntry } from ${JSON.stringify("./src/hooks/auto-update-checker/checker/plugin-entry")};`,
     `const result = findPluginEntry(${JSON.stringify(directory)});`,
@@ -27,6 +28,7 @@ function runFindPluginEntry(
     cwd: process.cwd(),
     env: {
       ...process.env,
+      OPENCODE_CONFIG_DIR: defaultConfigDir,
       ...envOverrides,
     },
     encoding: "utf-8",
