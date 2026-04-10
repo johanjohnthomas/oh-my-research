@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs"
 import type { ConfigMergeResult } from "../types"
-import { PLUGIN_NAME, LEGACY_PLUGIN_NAME } from "../../shared"
+import { PACKAGE_NAME, LEGACY_PACKAGE_NAME, LEGACY_PLUGIN_NAME } from "../../shared"
 import { backupConfigFile } from "./backup-config"
 import { getConfigDir } from "./config-context"
 import { ensureConfigDirectoryExists } from "./ensure-config-directory-exists"
@@ -22,7 +22,7 @@ export async function addPluginToOpenCodeConfig(currentVersion: string): Promise
   }
 
   const { format, path } = detectConfigFormat()
-  const pluginEntry = await getPluginNameWithVersion(currentVersion, PLUGIN_NAME)
+  const pluginEntry = await getPluginNameWithVersion(currentVersion, PACKAGE_NAME)
 
   try {
     if (format === "none") {
@@ -44,15 +44,33 @@ export async function addPluginToOpenCodeConfig(currentVersion: string): Promise
     const plugins = config.plugin ?? []
 
     const canonicalEntries = plugins.filter(
-      (plugin) => plugin === PLUGIN_NAME || plugin.startsWith(`${PLUGIN_NAME}@`)
+      (plugin) => plugin === PACKAGE_NAME || plugin.startsWith(`${PACKAGE_NAME}@`)
     )
     const legacyEntries = plugins.filter(
-      (plugin) => plugin === LEGACY_PLUGIN_NAME || plugin.startsWith(`${LEGACY_PLUGIN_NAME}@`)
+      (plugin) => plugin === LEGACY_PACKAGE_NAME || plugin.startsWith(`${LEGACY_PACKAGE_NAME}@`)
+        || plugin === LEGACY_PLUGIN_NAME || plugin.startsWith(`${LEGACY_PLUGIN_NAME}@`)
     )
     const otherPlugins = plugins.filter(
-      (plugin) => !(plugin === PLUGIN_NAME || plugin.startsWith(`${PLUGIN_NAME}@`))
+      (plugin) => !(plugin === PACKAGE_NAME || plugin.startsWith(`${PACKAGE_NAME}@`))
+        && !(plugin === LEGACY_PACKAGE_NAME || plugin.startsWith(`${LEGACY_PACKAGE_NAME}@`))
         && !(plugin === LEGACY_PLUGIN_NAME || plugin.startsWith(`${LEGACY_PLUGIN_NAME}@`))
     )
+
+    const normalizedPlugins = [...otherPlugins]
+
+    if (canonicalEntries.length > 0 || legacyEntries.length > 0) {
+      normalizedPlugins.push(pluginEntry)
+    } else {
+      normalizedPlugins.push(pluginEntry)
+    }
+
+    const hasNoChanges =
+      plugins.length === normalizedPlugins.length
+      && plugins.every((plugin, index) => plugin === normalizedPlugins[index])
+
+    if (hasNoChanges) {
+      return { success: true, configPath: path }
+    }
 
     const existingEntry = canonicalEntries[0] ?? legacyEntries[0]
     if (existingEntry) {
@@ -75,14 +93,6 @@ export async function addPluginToOpenCodeConfig(currentVersion: string): Promise
           error: `Failed to create backup: ${backupResult.error}`,
         }
       }
-    }
-
-    const normalizedPlugins = [...otherPlugins]
-
-    if (canonicalEntries.length > 0 || legacyEntries.length > 0) {
-      normalizedPlugins.push(pluginEntry)
-    } else {
-      normalizedPlugins.push(pluginEntry)
     }
 
     config.plugin = normalizedPlugins
