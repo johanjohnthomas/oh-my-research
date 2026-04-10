@@ -821,8 +821,8 @@ describe("createEventHandler - retry dedupe lifecycle", () => {
 		}))
 
 		//#then
-		expect(abortCalls).toEqual([sessionID, sessionID])
-		expect(promptCalls).toEqual([sessionID, sessionID])
+		expect(abortCalls).toEqual([])
+		expect(promptCalls).toEqual([])
 	})
 })
 
@@ -937,7 +937,7 @@ describe("createEventHandler - session recovery compaction", () => {
 
 	it("continues dispatching later event hooks when an earlier hook throws", async () => {
 		//#given
-		const runtimeFallbackCalls: EventInput[] = []
+		const backgroundNotificationCalls: EventInput[] = []
 
 		const eventHandler = createEventHandler({
 			ctx: asEventHandlerContext({
@@ -961,9 +961,9 @@ describe("createEventHandler - session recovery compaction", () => {
 						throw new Error("upstream hook failed")
 					},
 				},
-				runtimeFallback: {
+				backgroundNotificationHook: {
 					event: async (input: EventInput) => {
-						runtimeFallbackCalls.push(input)
+						backgroundNotificationCalls.push(input)
 					},
 				},
 				stopContinuationGuard: { isStopped: () => false },
@@ -988,7 +988,7 @@ describe("createEventHandler - session recovery compaction", () => {
 
 		//#then
 		expect(thrownError).toBeUndefined()
-		expect(runtimeFallbackCalls).toHaveLength(1)
-		expect(runtimeFallbackCalls[0]?.event.type).toBe("session.error")
+		expect(backgroundNotificationCalls).toHaveLength(1)
+		expect(backgroundNotificationCalls[0]?.event.type).toBe("session.error")
 	})
 })

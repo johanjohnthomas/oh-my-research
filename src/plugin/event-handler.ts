@@ -12,7 +12,7 @@ export function createEventHandler(args: EventHandlerArgs) {
   const tmuxIntegrationEnabled = isTmuxIntegrationEnabled(pluginConfig)
   const pluginContext = ctx as EventPluginContext
   const { dispatchToHooks } = createEventHookDispatcher(hooks)
-  const modelFallbackRuntime = createEventModelFallbackRuntime({ pluginContext, pluginConfig, hooks })
+  const modelFallbackRuntime = createEventModelFallbackRuntime({ pluginContext, hooks })
 
   const recentSyntheticIdles = new Map<string, number>()
   const recentRealIdles = new Map<string, number>()

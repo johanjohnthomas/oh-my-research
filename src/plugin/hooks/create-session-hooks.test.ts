@@ -20,38 +20,22 @@ const mockContext = {
 const mockModelCacheState = {} as ModelCacheState
 
 describe("createSessionHooks", () => {
-  it("keeps model fallback disabled when config is unset", () => {
+  it("does not expose model fallback hook in the release path", () => {
     // given
-    const pluginConfig = {} as OhMyOpenCodeConfig
+    const pluginConfig = {} as OhMyResearchConfig
 
     // when
     const result = createSessionHooks({
       ctx: mockContext,
       pluginConfig,
       modelCacheState: mockModelCacheState,
-      isHookEnabled: (hookName) => hookName === "model-fallback",
+      isHookEnabled: () => true,
       safeHookEnabled: true,
     })
 
     // then
-    expect(result.modelFallback).toBeNull()
-  })
-
-  it("creates model fallback hook when config explicitly enables it", () => {
-    // given
-    const pluginConfig = { model_fallback: true } as OhMyOpenCodeConfig
-
-    // when
-    const result = createSessionHooks({
-      ctx: mockContext,
-      pluginConfig,
-      modelCacheState: mockModelCacheState,
-      isHookEnabled: (hookName) => hookName === "model-fallback",
-      safeHookEnabled: true,
-    })
-
-    // then
-    expect(result.modelFallback).not.toBeNull()
+    expect("modelFallback" in result).toBe(false)
+    expect("runtimeFallback" in result).toBe(false)
   })
 
   it("skips interactive bash session hook when tmux integration is disabled", () => {
@@ -65,7 +49,7 @@ describe("createSessionHooks", () => {
         agent_pane_min_width: 40,
         isolation: "inline",
       },
-    } as OhMyOpenCodeConfig
+    } as OhMyResearchConfig
 
     // when
     const result = createSessionHooks({

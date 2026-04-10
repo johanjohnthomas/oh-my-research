@@ -65,7 +65,7 @@ describe("createEventHandler - model fallback", () => {
     _resetForTesting()
   })
 
-  test("triggers retry prompt for assistant message.updated APIError payloads (headless resume)", async () => {
+  test("does not trigger retry prompt for assistant message.updated APIError payloads in the release path", async () => {
     //#given
     const sessionID = "ses_message_updated_fallback"
     const modelFallback = createModelFallbackHook()
@@ -103,11 +103,11 @@ describe("createEventHandler - model fallback", () => {
     })
 
     //#then
-    expect(abortCalls).toEqual([sessionID])
-    expect(promptCalls).toEqual([sessionID])
+    expect(abortCalls).toEqual([])
+    expect(promptCalls).toEqual([])
   })
 
-  test("triggers retry prompt for nested model error payloads", async () => {
+  test("does not trigger retry prompt for nested model error payloads in the release path", async () => {
     //#given
     const sessionID = "ses_main_fallback_nested"
     setMainSession(sessionID)
@@ -134,11 +134,11 @@ describe("createEventHandler - model fallback", () => {
     })
 
     //#then
-    expect(abortCalls).toEqual([sessionID])
-    expect(promptCalls).toEqual([sessionID])
+    expect(abortCalls).toEqual([])
+    expect(promptCalls).toEqual([])
   })
 
-  test("triggers retry prompt on session.status retry events and applies fallback", async () => {
+  test("does not apply fallback models on session.status retry events in the release path", async () => {
     //#given
     const sessionID = "ses_status_retry_fallback"
     setMainSession(sessionID)
@@ -219,12 +219,9 @@ describe("createEventHandler - model fallback", () => {
     )
 
     //#then
-    expect(abortCalls).toEqual([sessionID])
-    expect(promptCalls).toEqual([sessionID])
-    expect(output.message["model"]).toMatchObject({
-      providerID: "opencode-go",
-      modelID: "kimi-k2.5",
-    })
+    expect(abortCalls).toEqual([])
+    expect(promptCalls).toEqual([])
+    expect(output.message["model"]).toBeUndefined()
     expect(output.message["variant"]).toBeUndefined()
   })
 
@@ -285,8 +282,8 @@ describe("createEventHandler - model fallback", () => {
     })
 
     //#then
-    expect(abortCalls).toEqual([sessionID])
-    expect(promptCalls).toEqual([sessionID])
+    expect(abortCalls).toEqual([])
+    expect(promptCalls).toEqual([])
   })
 
   test("does not trigger model-fallback from session.status when runtime_fallback is enabled", async () => {
@@ -342,7 +339,7 @@ describe("createEventHandler - model fallback", () => {
     expect(promptCalls).toEqual([])
   })
 
-  test("prefers user-configured fallback_models over hardcoded chain on session.status retry", async () => {
+  test("does not use user-configured fallback_models on session.status retry in the release path", async () => {
     //#given
     const sessionID = "ses_status_retry_user_fallback"
     setMainSession(sessionID)
@@ -430,16 +427,13 @@ describe("createEventHandler - model fallback", () => {
     )
 
     //#then
-    expect(abortCalls).toEqual([sessionID])
-    expect(promptCalls).toEqual([sessionID])
-    expect(output.message["model"]).toEqual({
-      providerID: "quotio",
-      modelID: "gpt-5.2",
-    })
+    expect(abortCalls).toEqual([])
+    expect(promptCalls).toEqual([])
+    expect(output.message["model"]).toBeUndefined()
     expect(output.message["variant"]).toBeUndefined()
   })
 
-  test("advances main-session fallback chain across repeated session.error retries end-to-end", async () => {
+  test("does not advance fallback chains across repeated session.error retries in the release path", async () => {
     //#given
     const abortCalls: string[] = []
     const promptCalls: string[] = []
@@ -550,23 +544,17 @@ describe("createEventHandler - model fallback", () => {
     const first = await triggerRetryCycle()
 
     //#then - first fallback entry applied (no-op skip: claude-opus-4-6 matches current model after normalization)
-    expect(first.message["model"]).toMatchObject({
-      providerID: "opencode-go",
-      modelID: "kimi-k2.5",
-    })
+    expect(first.message["model"]).toBeUndefined()
     expect(first.message["variant"]).toBeUndefined()
 
     //#when - second retry cycle
     const second = await triggerRetryCycle()
 
     //#then - second fallback entry applied (chain advanced past opencode-go/kimi-k2.5)
-    expect(second.message["model"]).toMatchObject({
-      providerID: "kimi-for-coding",
-      modelID: "k2p5",
-    })
+    expect(second.message["model"]).toBeUndefined()
     expect(second.message["variant"]).toBeUndefined()
-    expect(abortCalls).toEqual([sessionID, sessionID])
-    expect(promptCalls).toEqual([sessionID, sessionID])
+    expect(abortCalls).toEqual([])
+    expect(promptCalls).toEqual([])
     expect(toastCalls.length).toBeGreaterThanOrEqual(0)
   })
 
