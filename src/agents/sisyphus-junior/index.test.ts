@@ -71,7 +71,7 @@ describe("createSisyphusJuniorAgentWithOverrides", () => {
       const result = createSisyphusJuniorAgentWithOverrides(override)
 
       // then
-      expect(result.prompt).toContain("Sisyphus-Junior")
+      expect(result.prompt).toContain("Research Assistant")
       expect(result.prompt).toContain("Extra instructions here")
     })
   })
@@ -138,7 +138,7 @@ describe("createSisyphusJuniorAgentWithOverrides", () => {
       const result = createSisyphusJuniorAgentWithOverrides(override)
 
       // then
-      expect(result.prompt).toContain("Sisyphus-Junior")
+      expect(result.prompt).toContain("Research Assistant")
       expect(result.prompt).not.toBe("Completely new prompt that replaces everything")
     })
   })
@@ -323,7 +323,7 @@ describe("createSisyphusJuniorAgentWithOverrides", () => {
       const result = createSisyphusJuniorAgentWithOverrides(override)
 
       // then
-      expect(result.prompt).toContain("Sisyphus-Junior")
+      expect(result.prompt).toContain("Research Assistant")
       expect(result.prompt).toContain("Execute tasks directly")
     })
 

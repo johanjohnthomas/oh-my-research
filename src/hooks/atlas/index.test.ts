@@ -1817,10 +1817,10 @@ session_id: ses_untrusted_999
         started_at: "2026-01-02T10:00:00Z",
         session_ids: [MAIN_SESSION_ID],
         plan_name: "test-plan",
-        agent: "Atlas - Plan Executor",
+        agent: "Workflow Operator",
       }
       writeBoulderState(TEST_DIR, state)
-      registerAgentName("Atlas - Plan Executor")
+      registerAgentName("Workflow Operator")
 
       const mockInput = createMockPluginInput()
       const hook = createAtlasHook(mockInput)
@@ -1836,7 +1836,7 @@ session_id: ses_untrusted_999
       // then
       expect(mockInput._promptMock).toHaveBeenCalled()
       const callArgs = mockInput._promptMock.mock.calls[0][0]
-      expect(callArgs.body.agent).toBe("Atlas - Plan Executor")
+      expect(callArgs.body.agent).toBe("Workflow Operator")
       expect(callArgs.body.agent).not.toBe("atlas")
     })
 

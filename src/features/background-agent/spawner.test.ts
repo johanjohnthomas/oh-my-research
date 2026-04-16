@@ -36,7 +36,7 @@ describe("background-agent spawner agent-not-found fallback", () => {
     const task = createTask({
       description: "Implement feature",
       prompt: "Please implement the break-even analysis",
-      agent: "Sisyphus-Junior",
+      agent: "Research Assistant",
       parentSessionID: "ses_parent",
       parentMessageID: "msg_parent",
     })
@@ -72,7 +72,7 @@ describe("background-agent spawner agent-not-found fallback", () => {
     //#then
     // Should have called promptAsync twice: once with original agent, once with fallback
     expect(promptCalls).toHaveLength(2)
-    expect(promptCalls[0].body.agent).toBe("Sisyphus-Junior")
+    expect(promptCalls[0].body.agent).toBe("Research Assistant")
     expect(promptCalls[1].body.agent).toBe("general")
     // Original prompt content preserved in fallback
     expect(promptCalls[1].body.parts).toEqual(promptCalls[0].body.parts)
@@ -108,7 +108,7 @@ describe("background-agent spawner agent-not-found fallback", () => {
     const task = createTask({
       description: "Implement feature",
       prompt: "Do work",
-      agent: "Sisyphus-Junior",
+      agent: "Research Assistant",
       parentSessionID: "ses_parent",
       parentMessageID: "msg_parent",
     })
@@ -161,7 +161,7 @@ describe("background-agent spawner agent-not-found fallback", () => {
     const task = createTask({
       description: "Implement feature",
       prompt: "Do work",
-      agent: "Sisyphus-Junior",
+      agent: "Research Assistant",
       parentSessionID: "ses_parent",
       parentMessageID: "msg_parent",
     })
@@ -220,7 +220,7 @@ describe("background-agent spawner agent-not-found fallback", () => {
     const task = createTask({
       description: "Test task",
       prompt: "Do work",
-      agent: "Sisyphus-Junior",
+      agent: "Research Assistant",
       parentSessionID: "ses_parent",
       parentMessageID: "msg_parent",
     })
@@ -253,7 +253,7 @@ describe("background-agent spawner agent-not-found fallback", () => {
 
     //#then
     expect(promptCalls).toHaveLength(2)
-    expect(promptCalls[0].body.agent).toBe("Sisyphus-Junior")
+    expect(promptCalls[0].body.agent).toBe("Research Assistant")
     expect(promptCalls[1].body.agent).toBe("general")
     expect(onTaskError).not.toHaveBeenCalled()
   })
