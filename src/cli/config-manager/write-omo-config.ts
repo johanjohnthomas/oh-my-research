@@ -29,15 +29,6 @@ export function writeOmoConfig(installConfig: InstallConfig): ConfigMergeResult 
     const newConfig = generateOmoConfig(installConfig)
 
     if (existsSync(omoConfigPath)) {
-      const backupResult = backupConfigFile(omoConfigPath)
-      if (!backupResult.success) {
-        return {
-          success: false,
-          configPath: omoConfigPath,
-          error: `Failed to create backup: ${backupResult.error}`,
-        }
-      }
-
       try {
         const stat = statSync(omoConfigPath)
         const content = readFileSync(omoConfigPath, "utf-8")
@@ -54,9 +45,31 @@ export function writeOmoConfig(installConfig: InstallConfig): ConfigMergeResult 
         }
 
         const merged = deepMergeRecord(newConfig, existing)
+        if (JSON.stringify(existing) === JSON.stringify(merged)) {
+          return { success: true, configPath: omoConfigPath }
+        }
+
+        const backupResult = backupConfigFile(omoConfigPath)
+        if (!backupResult.success) {
+          return {
+            success: false,
+            configPath: omoConfigPath,
+            error: `Failed to create backup: ${backupResult.error}`,
+          }
+        }
+
         writeFileSync(omoConfigPath, JSON.stringify(merged, null, 2) + "\n")
       } catch (parseErr) {
         if (parseErr instanceof SyntaxError) {
+          const backupResult = backupConfigFile(omoConfigPath)
+          if (!backupResult.success) {
+            return {
+              success: false,
+              configPath: omoConfigPath,
+              error: `Failed to create backup: ${backupResult.error}`,
+            }
+          }
+
           writeFileSync(omoConfigPath, JSON.stringify(newConfig, null, 2) + "\n")
           return { success: true, configPath: omoConfigPath }
         }

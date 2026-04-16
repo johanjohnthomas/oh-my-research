@@ -3,4 +3,7 @@ import { runCli } from "./cli-program"
 import { bootstrapOpenCodeIntegration } from "./opencode-bootstrap"
 
 await bootstrapOpenCodeIntegration()
-await runCli()
+
+if (process.env.OH_MY_RESEARCH_BOOTSTRAP_ONLY !== "1") {
+  await runCli()
+}

@@ -1,3 +1,5 @@
+/// <reference path="../../bun-test.d.ts" />
+
 import { describe, expect, it, mock } from "bun:test"
 
 import { bootstrapOpenCodeIntegration } from "./opencode-bootstrap"
@@ -26,8 +28,6 @@ describe("bootstrapOpenCodeIntegration", () => {
       isOpenCodeInstalled: async () => false,
       addPluginToOpenCodeConfig,
       detectCurrentConfig: () => detectedConfig,
-      getOmoConfigPath: () => "/tmp/oh-my-research.json",
-      existsSync: () => false,
       writeOmoConfig,
       warn: () => {},
     })
@@ -45,8 +45,6 @@ describe("bootstrapOpenCodeIntegration", () => {
       isOpenCodeInstalled: async () => true,
       addPluginToOpenCodeConfig,
       detectCurrentConfig: () => detectedConfig,
-      getOmoConfigPath: () => "/tmp/oh-my-research.json",
-      existsSync: () => false,
       writeOmoConfig,
       warn: () => {},
     })
@@ -65,7 +63,7 @@ describe("bootstrapOpenCodeIntegration", () => {
     })
   })
 
-  it("is a no-op for config writes when OMR config already exists", async () => {
+  it("still delegates to config merge when OMR config already exists", async () => {
     const addPluginToOpenCodeConfig = mock(async () => ({ success: true }))
     const writeOmoConfig = mock((_config: InstallConfig) => ({ success: true }))
 
@@ -74,13 +72,11 @@ describe("bootstrapOpenCodeIntegration", () => {
       isOpenCodeInstalled: async () => true,
       addPluginToOpenCodeConfig,
       detectCurrentConfig: () => ({ ...detectedConfig, isInstalled: true, installedVersion: "1.0.0" }),
-      getOmoConfigPath: () => "/tmp/oh-my-research.json",
-      existsSync: () => true,
       writeOmoConfig,
       warn: () => {},
     })
 
     expect(addPluginToOpenCodeConfig).toHaveBeenCalledWith("1.0.0")
-    expect(writeOmoConfig).not.toHaveBeenCalled()
+    expect(writeOmoConfig).toHaveBeenCalled()
   })
 })

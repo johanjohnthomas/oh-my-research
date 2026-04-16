@@ -1,10 +1,7 @@
-import { existsSync } from "node:fs"
-
 import packageJson from "../../package.json" with { type: "json" }
 import {
   addPluginToOpenCodeConfig,
   detectCurrentConfig,
-  getOmoConfigPath,
   isOpenCodeInstalled,
   writeOmoConfig,
 } from "./config-manager"
@@ -15,8 +12,6 @@ type BootstrapDeps = {
   isOpenCodeInstalled: () => Promise<boolean>
   detectCurrentConfig: () => DetectedConfig
   addPluginToOpenCodeConfig: (currentVersion: string) => Promise<{ success: boolean; error?: string }>
-  getOmoConfigPath: () => string
-  existsSync: (path: string) => boolean
   writeOmoConfig: (config: InstallConfig) => { success: boolean; error?: string }
   warn: (message: string) => void
 }
@@ -41,8 +36,6 @@ export async function bootstrapOpenCodeIntegration(deps?: Partial<BootstrapDeps>
     isOpenCodeInstalled,
     detectCurrentConfig,
     addPluginToOpenCodeConfig,
-    getOmoConfigPath,
-    existsSync,
     writeOmoConfig,
     warn: (message) => console.warn(message),
     ...deps,
@@ -55,11 +48,6 @@ export async function bootstrapOpenCodeIntegration(deps?: Partial<BootstrapDeps>
   const pluginResult = await resolvedDeps.addPluginToOpenCodeConfig(resolvedDeps.version)
   if (!pluginResult.success) {
     resolvedDeps.warn(`[oh-my-research] OpenCode setup skipped: ${pluginResult.error ?? "unknown plugin config error"}`)
-    return
-  }
-
-  const omoConfigPath = resolvedDeps.getOmoConfigPath()
-  if (resolvedDeps.existsSync(omoConfigPath)) {
     return
   }
 
