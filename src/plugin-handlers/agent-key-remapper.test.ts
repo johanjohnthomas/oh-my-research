@@ -15,7 +15,7 @@ describe("remapAgentKeysToDisplayNames", () => {
 
     // then known agents get display name keys only
     expect(result[getAgentDisplayName("sisyphus")]).toBeDefined()
-    expect(result["oracle"]).toBeDefined()
+    expect(result[getAgentDisplayName("oracle")]).toBeDefined()
     expect(result["sisyphus"]).toBeUndefined()
   })
 

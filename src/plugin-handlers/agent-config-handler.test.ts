@@ -86,7 +86,7 @@ describe("applyAgentConfig builtin override protection", () => {
   }
 
   const sisyphusJuniorConfig: AgentConfig = {
-    name: "Sisyphus-Junior",
+    name: "Research Assistant",
     prompt: "junior prompt",
     mode: "all",
   }
