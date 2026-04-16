@@ -54,32 +54,36 @@ try {
   assertExists(`${workspaceDir}/.research/derived/obsidian/claims.md`)
   assertExists(`${workspaceDir}/.research/derived/knowledge-graph/graph.json`)
 
-  const tarball = run("npm", ["pack", "--silent"], repoRoot).split("\n").filter(Boolean).at(-1)
+  const tarballOutput = run("npm", ["pack", "--silent"], repoRoot).split("\n").filter(Boolean)
+  const tarball = tarballOutput[tarballOutput.length - 1]
   if (!tarball) {
     throw new Error("npm pack did not produce a tarball name")
   }
 
-  run("npm", ["init", "-y"], packageDir)
-  run("npm", ["install", `${repoRoot}/${tarball}`], packageDir)
-  run("bun", ["-e", 'import("@johanjohnthomas/oh-my-research").then((m)=>console.log(Object.keys(m).length))'], packageDir)
-
-  const fakeOpenCodePath = join(fakeBinDir, "opencode")
+  const fakeOpenCodePath = join(fakeBinDir, "oc")
   writeFileSync(fakeOpenCodePath, "#!/bin/sh\necho 1.0.0\n", "utf-8")
   chmodSync(fakeOpenCodePath, 0o755)
   mkdirSync(opencodeDir, { recursive: true })
+
+  const installEnv = {
+    PATH: `${fakeBinDir}:${process.env.PATH ?? ""}`,
+    OPENCODE_CONFIG_DIR: opencodeDir,
+    OH_MY_RESEARCH_OPENCODE_BINARIES: "oc",
+  }
+
+  run("npm", ["init", "-y"], packageDir)
+  run("npm", ["install", `${repoRoot}/${tarball}`], packageDir, installEnv)
+  assertExists(`${opencodeDir}/opencode.json`)
+  assertExists(`${opencodeDir}/oh-my-research.json`)
+
+  run("bun", ["-e", 'import("@johanjohnthomas/oh-my-research").then((m)=>console.log(Object.keys(m).length))'], packageDir, installEnv)
 
   run(
     `${packageDir}/node_modules/.bin/oh-my-research`,
     ["--help"],
     packageDir,
-    {
-      PATH: `${fakeBinDir}:${process.env.PATH ?? ""}`,
-      OPENCODE_CONFIG_DIR: opencodeDir,
-    },
+    installEnv,
   )
-
-  assertExists(`${opencodeDir}/opencode.json`)
-  assertExists(`${opencodeDir}/oh-my-research.json`)
 
   console.log("Product verification completed")
   console.log(`Workspace: ${workspaceDir}`)
