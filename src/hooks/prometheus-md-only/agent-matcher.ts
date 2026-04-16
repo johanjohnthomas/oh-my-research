@@ -1,5 +1,7 @@
 import { PROMETHEUS_AGENT } from "./constants"
+import { getAgentConfigKey } from "../../shared/agent-display-names"
 
 export function isPrometheusAgent(agentName: string | undefined): boolean {
-  return agentName?.toLowerCase().includes(PROMETHEUS_AGENT) ?? false
+  if (!agentName) return false
+  return getAgentConfigKey(agentName) === PROMETHEUS_AGENT
 }

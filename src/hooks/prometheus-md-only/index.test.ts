@@ -92,9 +92,9 @@ describe("prometheus-md-only", () => {
       ).rejects.toThrow("File operations restricted to .sisyphus/*.md plan files only")
     })
 
-    test("should enforce md-only restriction for Prometheus display name Plan Builder", async () => {
+    test("should enforce md-only restriction for Workflow Planner display name", async () => {
       //#given
-      setupMessageStorage(TEST_SESSION_ID, "Prometheus - Plan Builder")
+      setupMessageStorage(TEST_SESSION_ID, "Workflow Planner")
       const hook = createPrometheusMdOnlyHook(createMockPluginInput())
       const input = {
         tool: "Write",
@@ -111,9 +111,9 @@ describe("prometheus-md-only", () => {
       ).rejects.toThrow("File operations restricted to .sisyphus/*.md plan files only")
     })
 
-    test("should enforce md-only restriction for Prometheus display name Planner", async () => {
+    test("should enforce md-only restriction for Workflow Planner alias", async () => {
       //#given
-      setupMessageStorage(TEST_SESSION_ID, "Prometheus - Plan Builder")
+      setupMessageStorage(TEST_SESSION_ID, "Workflow Planner")
       const hook = createPrometheusMdOnlyHook(createMockPluginInput())
       const input = {
         tool: "Write",
