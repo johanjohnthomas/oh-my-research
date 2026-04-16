@@ -1,7 +1,7 @@
 /**
  * Agent config keys to display names mapping.
  * Config keys are lowercase (e.g., "sisyphus", "atlas").
- * Display names include suffixes for UI/logs (e.g., "Sisyphus - Ultraworker").
+ * Display names include clear product-facing labels for UI/logs (e.g., "Research Director").
  *
  * IMPORTANT: Display names MUST NOT contain parentheses or other characters
  * that are invalid in HTTP header values per RFC 7230. OpenCode passes the
@@ -10,15 +10,15 @@
  * type selector dropdown. Use ` - ` (space-dash-space) instead of `(...)`.
  */
 export const AGENT_DISPLAY_NAMES: Record<string, string> = {
-  sisyphus: "Sisyphus - Ultraworker",
-  hephaestus: "Hephaestus - Deep Agent",
-  prometheus: "Prometheus - Plan Builder",
-  atlas: "Atlas - Plan Executor",
-  "sisyphus-junior": "Sisyphus-Junior",
-  metis: "Metis - Plan Consultant",
-  momus: "Momus - Plan Critic",
-  athena: "Athena - Council",
-  "athena-junior": "Athena-Junior - Council",
+  sisyphus: "Research Director",
+  hephaestus: "Deep Researcher",
+  prometheus: "Workflow Planner",
+  atlas: "Workflow Operator",
+  "sisyphus-junior": "Research Assistant",
+  metis: "Planning Analyst",
+  momus: "Plan Reviewer",
+  athena: "Review Council",
+  "athena-junior": "Review Assistant",
   oracle: "oracle",
   librarian: "librarian",
   explore: "explore",
@@ -78,19 +78,28 @@ const REVERSE_DISPLAY_NAMES: Record<string, string> = Object.fromEntries(
 // Legacy parenthesized display names for backward compatibility.
 // Old configs/sessions may reference these names; resolve them to config keys.
 const LEGACY_DISPLAY_NAMES: Record<string, string> = {
+  "sisyphus - ultraworker": "sisyphus",
   "sisyphus (ultraworker)": "sisyphus",
+  "hephaestus - deep agent": "hephaestus",
   "hephaestus (deep agent)": "hephaestus",
+  "prometheus - plan builder": "prometheus",
   "prometheus (plan builder)": "prometheus",
+  "atlas - plan executor": "atlas",
   "atlas (plan executor)": "atlas",
+  "metis - plan consultant": "metis",
   "metis (plan consultant)": "metis",
+  "momus - plan critic": "momus",
   "momus (plan critic)": "momus",
+  "athena - council": "athena",
   "athena (council)": "athena",
+  "athena-junior - council": "athena-junior",
   "athena-junior (council)": "athena-junior",
+  "sisyphus-junior": "sisyphus-junior",
 }
 
 /**
  * Resolve an agent name (display name or config key) to its lowercase config key.
- * "Atlas - Plan Executor" -> "atlas", "Atlas (Plan Executor)" -> "atlas", "atlas" -> "atlas"
+ * "Workflow Operator" -> "atlas", "Atlas (Plan Executor)" -> "atlas", "atlas" -> "atlas"
  */
 export function getAgentConfigKey(agentName: string): string {
   const lower = stripAgentListSortPrefix(agentName).toLowerCase()
