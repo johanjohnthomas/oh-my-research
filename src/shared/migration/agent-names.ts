@@ -11,23 +11,29 @@ export const AGENT_NAME_MAP: Record<string, string> = {
   "Planner-Sisyphus": "prometheus",
   "planner-sisyphus": "prometheus",
   "Prometheus - Plan Builder": "prometheus",
+  "Workflow Planner": "prometheus",
   prometheus: "prometheus",
 
   // Atlas variants → "atlas"
   "orchestrator-sisyphus": "atlas",
+  "Atlas - Plan Executor": "atlas",
   Atlas: "atlas",
+  "Workflow Operator": "atlas",
   atlas: "atlas",
 
   // Metis variants → "metis"
   "plan-consultant": "metis",
   "Metis - Plan Consultant": "metis",
+  "Planning Analyst": "metis",
   metis: "metis",
 
   // Momus variants → "momus"
   "Momus - Plan Critic": "momus",
+  "Plan Reviewer": "momus",
   momus: "momus",
 
   // Sisyphus-Junior → "sisyphus-junior"
+  "Research Assistant": "sisyphus-junior",
   "Sisyphus-Junior": "sisyphus-junior",
   "sisyphus-junior": "sisyphus-junior",
 

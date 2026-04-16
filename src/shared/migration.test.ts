@@ -151,44 +151,44 @@ describe("migrateAgentNames", () => {
     // given agents config with "Prometheus - Plan Builder" key
     // when migrateAgentNames called
     // then key becomes "prometheus"
-    const agents = { "Prometheus - Plan Builder": { model: "test" } }
+      const agents = { "Workflow Planner": { model: "test" } }
     const { migrated, changed } = migrateAgentNames(agents)
     expect(changed).toBe(true)
     expect(migrated["prometheus"]).toEqual({ model: "test" })
-    expect(migrated["Prometheus - Plan Builder"]).toBeUndefined()
+      expect(migrated["Workflow Planner"]).toBeUndefined()
   })
 
   test("migrates Metis variants to lowercase", () => {
     // given agents config with "Metis - Plan Consultant" key
     // when migrateAgentNames called
     // then key becomes "metis"
-    const agents = { "Metis - Plan Consultant": { model: "test" } }
+      const agents = { "Planning Analyst": { model: "test" } }
     const { migrated, changed } = migrateAgentNames(agents)
     expect(changed).toBe(true)
     expect(migrated["metis"]).toEqual({ model: "test" })
-    expect(migrated["Metis - Plan Consultant"]).toBeUndefined()
+      expect(migrated["Planning Analyst"]).toBeUndefined()
   })
 
   test("migrates Momus variants to lowercase", () => {
     // given agents config with "Momus - Plan Critic" key
     // when migrateAgentNames called
     // then key becomes "momus"
-    const agents = { "Momus - Plan Critic": { model: "test" } }
+      const agents = { "Plan Reviewer": { model: "test" } }
     const { migrated, changed } = migrateAgentNames(agents)
     expect(changed).toBe(true)
     expect(migrated["momus"]).toEqual({ model: "test" })
-    expect(migrated["Momus - Plan Critic"]).toBeUndefined()
+      expect(migrated["Plan Reviewer"]).toBeUndefined()
   })
 
   test("migrates Sisyphus-Junior to lowercase", () => {
     // given agents config with "Sisyphus-Junior" key
     // when migrateAgentNames called
     // then key becomes "sisyphus-junior"
-    const agents = { "Sisyphus-Junior": { model: "test" } }
+    const agents = { "Research Assistant": { model: "test" } }
     const { migrated, changed } = migrateAgentNames(agents)
     expect(changed).toBe(true)
     expect(migrated["sisyphus-junior"]).toEqual({ model: "test" })
-    expect(migrated["Sisyphus-Junior"]).toBeUndefined()
+    expect(migrated["Research Assistant"]).toBeUndefined()
   })
 
   test("preserves lowercase passthrough", () => {
