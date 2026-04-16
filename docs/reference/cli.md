@@ -20,7 +20,7 @@ For a full product smoke path, use:
 bun run verify:product
 ```
 
-If OpenCode is installed, the first CLI invocation bootstraps the matching OpenCode plugin/config entries automatically before command execution.
+If OpenCode is installed, package installation bootstraps the matching OpenCode plugin/config entries automatically.
 
 ## Commands
 

@@ -20,7 +20,7 @@ Then verify the installed command:
 oh-my-research --help
 ```
 
-If OpenCode is already installed on the machine, the first CLI invocation automatically writes the matching OpenCode plugin entry and a default `oh-my-research` config file.
+If OpenCode is already installed on the machine, package installation automatically writes the matching OpenCode plugin entry and a default `oh-my-research` config file.
 
 ## Local Development Setup
 

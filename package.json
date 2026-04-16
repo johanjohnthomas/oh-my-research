@@ -1,6 +1,6 @@
 {
   "name": "@johanjohnthomas/oh-my-research",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Local-first research workflow system for evidence-backed LaTeX paper iteration",
   "main": "./dist/research-runtime.js",
   "types": "dist/research-runtime.d.ts",
@@ -28,7 +28,7 @@
     "build:schema": "bun run script/build-schema.ts",
     "build:model-capabilities": "bun run script/build-model-capabilities.ts",
     "clean": "rm -rf dist",
-    "postinstall": "node -e \"const {spawnSync}=require('node:child_process');const r=spawnSync('bun',['--version'],{stdio:'ignore'});if(r.error||r.status!==0){console.error('oh-my-research requires Bun on PATH to run the installed CLI. Install Bun from https://bun.sh first.');process.exit(1)}\"",
+    "postinstall": "node -e \"const {spawnSync}=require('node:child_process');const env={...process.env,OH_MY_RESEARCH_BOOTSTRAP_ONLY:'1'};const r=spawnSync('bun',['--version'],{stdio:'ignore'});if(r.error||r.status!==0){console.error('oh-my-research requires Bun on PATH to run the installed CLI. Install Bun from https://bun.sh first.');process.exit(1)};const b=spawnSync('bun',['dist/cli/index.js'],{stdio:'ignore',env});if(b.error||b.status!==0){process.exit(b.status||1)}\"",
     "prepare": "bun run build",
     "verify:product": "bun run script/verify-product.ts",
     "test:tmux": "bun test src/shared/tmux/tmux-utils.test.ts src/shared/tmux/tmux-utils/layout.test.ts",
