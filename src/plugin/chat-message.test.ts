@@ -414,7 +414,7 @@ describe("createChatMessageHandler - TUI variant passthrough", () => {
     //#then
     expect(output.message["model"]).toBeUndefined()
     expect(getSessionModel("test-session")).toEqual({ providerID: "openai", modelID: "gpt-5.4" })
-    expect(getSessionAgent("test-session")).toBe("Prometheus - Plan Builder")
+    expect(getSessionAgent("test-session")).toBe("Workflow Planner")
   })
 
   test("respects a mid-conversation model switch instead of reusing the previous stored model", async () => {
