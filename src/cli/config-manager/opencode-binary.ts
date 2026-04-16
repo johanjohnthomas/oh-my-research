@@ -2,17 +2,39 @@ import type { OpenCodeBinaryType } from "../../shared/opencode-config-dir-types"
 import { spawnWithWindowsHide } from "../../shared/spawn-with-windows-hide"
 import { initConfigContext } from "./config-context"
 
-const OPENCODE_BINARIES = ["opencode", "opencode-desktop"] as const
+const DEFAULT_OPENCODE_BINARIES = ["opencode", "opencode-desktop"] as const
 
 interface OpenCodeBinaryResult {
   binary: OpenCodeBinaryType
   version: string
 }
 
-async function findOpenCodeBinaryWithVersion(): Promise<OpenCodeBinaryResult | null> {
-  for (const binary of OPENCODE_BINARIES) {
+export function getOpenCodeBinaryCandidates(
+  envValue: string | undefined = process.env.OH_MY_RESEARCH_OPENCODE_BINARIES,
+): string[] {
+  const configured = envValue
+    ?.split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0)
+
+  if (!configured || configured.length === 0) {
+    return [...DEFAULT_OPENCODE_BINARIES]
+  }
+
+  return Array.from(new Set(configured))
+}
+
+function resolveBinaryType(binary: string): OpenCodeBinaryType {
+  return binary === "opencode-desktop" ? "opencode-desktop" : "opencode"
+}
+
+export async function findOpenCodeBinaryWithVersion(
+  candidates: string[] = getOpenCodeBinaryCandidates(),
+  spawn: typeof spawnWithWindowsHide = spawnWithWindowsHide,
+): Promise<OpenCodeBinaryResult | null> {
+  for (const binary of candidates) {
     try {
-      const proc = spawnWithWindowsHide([binary, "--version"], {
+      const proc = spawn([binary, "--version"], {
         stdout: "pipe",
         stderr: "pipe",
       })
@@ -20,8 +42,9 @@ async function findOpenCodeBinaryWithVersion(): Promise<OpenCodeBinaryResult | n
       await proc.exited
       if (proc.exitCode === 0) {
         const version = output.trim()
-        initConfigContext(binary, version)
-        return { binary, version }
+        const resolvedBinary = resolveBinaryType(binary)
+        initConfigContext(resolvedBinary, version)
+        return { binary: resolvedBinary, version }
       }
     } catch {
       continue
